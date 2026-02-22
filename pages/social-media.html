@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Social Media — Sara Peres</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../assets/shared.css"/>
+  <style>
+
+    /* ── TAG SECTIONS ── */
+    .tag-section { margin-bottom: 5rem; }
+    .tag-header {
+      display: flex; align-items: center; gap: 1.2rem;
+      margin-bottom: 2rem; padding-bottom: 1.2rem;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .tag-pill {
+      font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--teal); padding: 0.35rem 1rem;
+      border: 1px solid rgba(62,207,178,0.35); border-radius: 100px;
+    }
+    .tag-count { font-size: 0.7rem; color: var(--subtle); font-weight: 200; }
+
+    /* ── POSTS GRID ── */
+    .posts-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.2rem;
+    }
+
+    /* ── POST CARD ── */
+    .post-card {
+      position: relative;
+      border-radius: 4px;
+      overflow: hidden;
+      background: rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,255,255,0.06);
+      cursor: pointer;
+      transition: border-color 0.35s, box-shadow 0.35s, transform 0.35s;
+    }
+    .post-card:hover {
+      border-color: rgba(62,207,178,0.3);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      transform: translateY(-4px);
+    }
+
+    /* thumbnail — cover fills the frame, no dark background showing */
+    .post-thumb {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      display: block;
+      background: transparent;
+      transition: transform 0.5s;
+    }
+    /* portrait posts need different container */
+    .post-card.portrait .post-thumb { aspect-ratio: 16/16; object-fit: cover; }
+    .post-card.landscape .post-thumb { aspect-ratio: 16/16; object-fit: cover; }
+
+    /* subtle zoom on hover */
+    .post-card:hover .post-thumb { transform: scale(1.03); }
+
+    /* ── HOVER BLUR OVERLAY ── */
+    .post-hover-overlay {
+      position: absolute; inset: 0;
+      background: rgba(8,16,30,0.6);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 0.6rem;
+      opacity: 0; transition: opacity 0.35s;
+    }
+    .post-card:hover .post-hover-overlay { opacity: 1; }
+    .hover-view-btn {
+      font-size: 0.72rem; letter-spacing: 0.25em; text-transform: uppercase;
+      color: #fff; padding: 0.6rem 1.5rem;
+      border: 1px solid rgba(255,255,255,0.5); border-radius: 100px;
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(10px);
+    }
+    .hover-info-btn {
+      font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--teal); padding: 0.45rem 1.2rem;
+      border: 1px solid rgba(62,207,178,0.4); border-radius: 100px;
+      background: rgba(62,207,178,0.08);
+    }
+
+    /* ── LIGHTBOX ── */
+    #lightbox {
+      position: fixed; inset: 0; z-index: 5000;
+      background: rgba(5,10,20,0.97);
+      display: none;
+      align-items: center; justify-content: center;
+      padding: 2rem;
+      backdrop-filter: blur(20px);
+    }
+    #lightbox.open { display: flex; }
+
+    .lb-inner {
+      display: flex;
+      gap: 2.5rem;
+      max-height: 90vh;
+      width: 100%;
+      max-width: 1200px;
+      align-items: flex-start;
+    }
+
+    /* Full image — no crop, natural size */
+    .lb-img-wrap {
+      flex: 0 0 auto;
+      max-width: 60%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #lb-img {
+      max-height: 85vh;
+      max-width: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      display: block;
+      border-radius: 4px;
+      box-shadow: 0 40px 120px rgba(0,0,0,0.7);
+    }
+
+    /* Info panel */
+    .lb-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1.4rem;
+      padding: 1rem 0;
+      overflow-y: auto;
+      max-height: 85vh;
+    }
+    .lb-tag { font-size:0.62rem;letter-spacing:0.35em;text-transform:uppercase;color:var(--teal); }
+    .lb-title { font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;line-height:1.1; }
+    .lb-divider { width:50px;height:1px;background:linear-gradient(to right,var(--teal),transparent); }
+    .lb-label { font-size:0.6rem;letter-spacing:0.35em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:0.5rem; }
+    .lb-text { font-size:0.83rem;font-weight:200;line-height:1.8;color:rgba(255,255,255,0.75); }
+    .lb-colors { display:flex;gap:0.6rem;flex-wrap:wrap; }
+    .lb-swatch { display:flex;align-items:center;gap:0.5rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:100px;padding:0.3rem 0.8rem 0.3rem 0.3rem; }
+    .lb-dot { width:22px;height:22px;border-radius:50%;flex-shrink:0;border:1px solid rgba(255,255,255,0.15); }
+    .lb-hex { font-size:0.62rem;font-family:monospace;color:var(--subtle); }
+
+    /* Close & nav */
+    .lb-close {
+      position: absolute; top: 1.5rem; right: 2rem;
+      font-size: 1.8rem; color: rgba(255,255,255,0.5);
+      cursor: pointer; transition: color 0.2s; line-height: 1;
+      background: none; border: none;
+    }
+    .lb-close:hover { color: #fff; }
+    .lb-nav {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      font-size: 1.5rem; color: rgba(255,255,255,0.3);
+      cursor: pointer; transition: color 0.2s;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 50%; width: 48px; height: 48px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .lb-nav:hover { color: #fff; background: rgba(255,255,255,0.12); }
+    .lb-prev { left: 1rem; }
+    .lb-next { right: 1rem; }
+
+    @media(max-width:900px){
+      .posts-grid{grid-template-columns:1fr 1fr;}
+      .lb-inner{flex-direction:column;max-width:100%;}
+      .lb-img-wrap{max-width:100%;}
+      #lb-img{max-height:50vh;}
+    }
+    @media(max-width:580px){
+      .posts-grid{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<nav>
+  <a href="../index.html" class="nav-logo">Sara <span>Peres</span></a>
+  <ul class="nav-links">
+    <li><a href="../index.html#sobre">Sobre</a></li>
+    <li><a href="../index.html#projetos">Projetos</a></li>
+    <li><a href="logofólio.html">Logofólio</a></li>
+    <li><a href="identidade-visual.html">Identidade Visual</a></li>
+    <li><a href="social-media.html" class="active">Social Media</a></li>
+    <li><a href="../index.html#contato">Contato</a></li>
+  </ul>
+</nav>
+
+<div class="page-header">
+  <div class="orb orb-1" style="background:radial-gradient(circle,#f26b50 0%,transparent 70%);"></div>
+  <div class="orb orb-2" style="background:radial-gradient(circle,#f5a623 0%,transparent 70%);"></div>
+  <div class="orb orb-3"></div>
+  <p class="page-breadcrumb"><a href="../index.html">Home</a> &nbsp;/&nbsp; Social Media</p>
+  <h1 class="page-title">Social <em>Media</em></h1>
+  <p class="page-subtitle">Conteúdo visual para redes sociais. Clique para ver o post em tamanho original e informações de produção.</p>
+</div>
+
+<div class="page-content">
+
+  <!-- ── TECNOLOGIA ── -->
+  <div class="tag-section reveal">
+    <div class="tag-header">
+      <span class="tag-pill">Tecnologia</span>
+      <span class="tag-count">3 peças · Neetech</span>
+    </div>
+    <div class="posts-grid">
+      <div class="post-card portrait" onclick="openLightbox(0)">
+        <img class="post-thumb" src="../assets/neetech/post3.jpg" alt="Neetech Post 3"/>
+        <div class="post-hover-overlay">
+          <div class="hover-view-btn">Ver completo</div>
+          <div class="hover-info-btn">Mais informações ›</div>
+        </div>
+      </div>
+      <div class="post-card" onclick="openLightbox(1)">
+        <img class="post-thumb" src="../assets/neetech/post1.jpg" alt="Neetech Post 1"/>
+        <div class="post-hover-overlay">
+          <div class="hover-view-btn">Ver completo</div>
+          <div class="hover-info-btn">Mais informações ›</div>
+        </div>
+      </div>
+      <div class="post-card" onclick="openLightbox(2)">
+        <img class="post-thumb" src="../assets/neetech/post2.jpg" alt="Neetech Post 2"/>
+        <div class="post-hover-overlay">
+          <div class="hover-view-btn">Ver completo</div>
+          <div class="hover-info-btn">Mais informações ›</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ESPORTE ── -->
+  <div class="tag-section reveal">
+    <div class="tag-header">
+      <span class="tag-pill">Esporte</span>
+      <span class="tag-count">4 peças · RMT Esportivo</span>
+    </div>
+    <div class="posts-grid">
+      <div class="post-card portrait" onclick="openLightbox(3)">
+        <img class="post-thumb" src="../assets/rmt_esportivo/post1.jpg" alt="RMT Esportivo 1"/>
+        <div class="post-hover-overlay">
+          <div class="hover-view-btn">Ver completo</div>
+          <div class="hover-info-btn">Mais informações ›</div>
+        </div>
+      </div>
+      <div class="post-card portrait" onclick="openLightbox(4)">
+        <img class="post-thumb" src="../assets/rmt_esportivo/post2.jpg" alt="RMT Esportivo 2"/>
+        <div class="post-hover-overlay">
+          <div class="hover-view-btn">Ver completo</div>
+          <div class="hover-info-btn">Mais informações ›</div>
+        </div>
+      </div>
+      <div class="post-card portrait" onclick="openLightbox(5)">
+        <img class="post-thumb" src="../assets/rmt_esportivo_2/post1.jpg" alt="RMT Esportivo 2-1"/>
+        <div class="post-hover-overlay">
+          <div class="hover-view-btn">Ver completo</div>
+          <div class="hover-info-btn">Mais informações ›</div>
+        </div>
+      </div>
+      <div class="post-card portrait" onclick="openLightbox(6)">
+        <img class="post-thumb" src="../assets/rmt_esportivo_2/post2.jpg" alt="RMT Esportivo 2-2"/>
+        <div class="post-hover-overlay">
+          <div class="hover-view-btn">Ver completo</div>
+          <div class="hover-info-btn">Mais informações ›</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CORPORATIVO ── -->
+  <div class="tag-section reveal">
+    <div class="tag-header">
+      <span class="tag-pill">Corporativo</span>
+      <span class="tag-count">5 peças · RMT Empresarial</span>
+    </div>
+    <div class="posts-grid">
+      <div class="post-card" onclick="openLightbox(7)">
+        <img class="post-thumb" src="../assets/rmt_empresarial/post1.png" alt="RMT Emp 1"/>
+        <div class="post-hover-overlay">
+          <div class="hover-view-btn">Ver completo</div>
+          <div class="hover-info-btn">Mais informações ›</div>
+        </div>
+      </div>
+      <div class="post-card" onclick="openLightbox(8)">
+        <img class="post-thumb" src="../assets/rmt_empresarial/post2.png" alt="RMT Emp 2"/>
+        <div class="post-hover-overlay">
+          <div class="hover-view-btn">Ver completo</div>
+          <div class="hover-info-btn">Mais informações ›</div>
+        </div>
+      </div>
+      <div class="post-card" onclick="openLightbox(9)">
+        <img class="post-thumb" src="../assets/rmt_empresarial/post3.png" alt="RMT Emp 3"/>
+        <div class="post-hover-overlay">
+          <div class="hover-view-btn">Ver completo</div>
+          <div class="hover-info-btn">Mais informações ›</div>
+        </div>
+      </div>
+      <div class="post-card" onclick="openLightbox(10)">
+        <img class="post-thumb" src="../assets/rmt_empresarial_2/post1.png" alt="RMT Emp 2-1"/>
+        <div class="post-hover-overlay">
+          <div class="hover-view-btn">Ver completo</div>
+          <div class="hover-info-btn">Mais informações ›</div>
+        </div>
+      </div>
+      <div class="post-card" onclick="openLightbox(11)">
+        <img class="post-thumb" src="../assets/rmt_empresarial_2/post2.png" alt="RMT Emp 2-2"/>
+        <div class="post-hover-overlay">
+          <div class="hover-view-btn">Ver completo</div>
+          <div class="hover-info-btn">Mais informações ›</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── LIGHTBOX ── -->
+<div id="lightbox">
+  <button class="lb-close" onclick="closeLightbox()">✕</button>
+  <button class="lb-nav lb-prev" onclick="navLightbox(-1)">‹</button>
+  <button class="lb-nav lb-next" onclick="navLightbox(1)">›</button>
+  <div class="lb-inner">
+    <div class="lb-img-wrap">
+      <img id="lb-img" src="" alt=""/>
+    </div>
+    <div class="lb-info" id="lb-info"></div>
+  </div>
+</div>
+
+<footer>
+  <div class="orb-f"></div>
+  <div class="footer-inner">
+    <div class="footer-name grad-text">Sara Peres</div>
+    <p class="footer-tagline">Design Gráfico Júnior · Goiânia, GO</p>
+    <div class="footer-contact">
+      <div><span class="fc-label">E-mail</span><a href="mailto:saraperes190@gmail.com" class="fc-val">saraperes190@gmail.com</a></div>
+      <div><span class="fc-label">WhatsApp</span><a href="https://wa.me/5562995504704" class="fc-val">(62) 99550-4704</a></div>
+    </div>
+    <div class="footer-bottom">© 2025 Sara Peres de Souza · Todos os direitos reservados</div>
+  </div>
+</footer>
+
+<script>
+// ── POST DATA ──
+const posts = [
+  // 0 Neetech
+  { src:'../assets/neetech/post3.jpg', tag:'Tecnologia', title:'Neetech — Story para Instagram',
+    desc:'Post promocional destacando o diferencial do serviço: tecnologia sem complicações, sem sair de casa. Copy e visual trabalhados em conjunto.',
+    process:'Formato story (9:16) com fundo azul institucional. Ícones simples reforçam a mensagem visual.',
+    colors:['#0077B6','#F8F8F8','#F5A623'] },
+  { src:'../assets/neetech/post1.jpg', tag:'Tecnologia', title:'Neetech — Destaque de Serviço',
+    desc:'Post de apresentação dos serviços de suporte técnico. Layout limpo com hierarquia visual clara para comunicar confiabilidade e modernidade ao cliente.',
+    process:'Composição centrada com tipografia bold para chamar atenção no feed. O contraste entre fundo escuro e elementos ciano da marca Neetech garante destaque.',
+    colors:['#00BCD4','#1A1A2E','#FFFFFF'] },
+  { src:'../assets/neetech/post2.jpg', tag:'Tecnologia', title:'Neetech — Post Institucional',
+    desc:'Peça de engajamento com identidade visual consistente. Tipografia em escala grande cria impacto imediato no feed e direciona ao conteúdo.',
+    process:'Uso de grid centralizado e paleta monocromática com acento ciano. Hierarquia tipográfica em 3 níveis guia a leitura naturalmente.',
+    colors:['#00BCD4','#222222','#FFFFFF'] },
+  // 3-6 RMT Esportivo
+  { src:'../assets/rmt_esportivo/post1.jpg', tag:'Esporte', title:'RMT Esportivo — Story para Instagram 1',
+    desc:'Post dinâmico para marca esportiva. Composição diagonal e contraste alto transmitem movimento, energia e espírito competitivo.',
+    process:'Destaque do atleta através de profundidade e contraste. A tipografia mistura assinatura e fontes robustas para transmitir personalidade e velocidade. Faixas verticais organizam as imagens de ação do jogador.',
+    colors:['#E63946','#1D1D1D','#FFFFFF'] },
+  { src:'../assets/rmt_esportivo/post2.jpg', tag:'Esporte', title:'RMT Esportivo — Story para Instagram 2',
+    desc:'Layout impactante para engajamento.',
+    process:' Contraste e camadas para destacar o atleta. A tipografia mistura a assinatura elegante para o primeiro nome com uma fonte robusta e inclinada para o nome completo. Faixas verticais completam as imagens de ação do jogador.',
+    colors:['#E63946','#111111','#EEEEEE'] },
+  { src:'../assets/rmt_esportivo_2/post1.jpg', tag:'Esporte', title:'RMT Esportivo — Story para Instagram 3',
+    desc:' Post informativo de jogo de futebol, com jogador, times, local e data.',
+    process:'Organização de informações através de camadas e contraste. fundo escuro que isola os dados da partida, garantindo legibilidade e mantendo a identidade visual.',
+    colors:['#FF6B35','#0D0D0D','#FFFFFF'] },
+  { src:'../assets/rmt_esportivo_2/post2.jpg', tag:'Esporte', title:'RMT Esportivo — Story para Instagram 4',
+    desc:' Post informativo de jogo de futebol, com jogador, times, local e data.',
+    process:'foto do atleta em ação com profundidade de campo. O jogador principal é posicionado à esquerda, enquanto as informações estao à direita, criando um fluxo de leitura claro de cima para baixo.',
+    colors:['#FF6B35','#F5F5F5','#1A1A1A'] },
+  // 7-11 RMT Empresarial
+  { src:'../assets/rmt_empresarial/post1.png', tag:'Corporativo', title:'RMT Empresarial — Post 1',
+    desc:'Post institucional com visual sóbrio e profissional.',
+    process:' O post prioriza a conexão emocional e a conscientização. A hierarquia tipográfica destaca a pergunta sobre vacinação para garantir uma leitura rápida.',
+    colors:['#2C3E50','#E8B84B','#F5F5F5'] },
+  
+    { src:'../assets/rmt_empresarial/post2.png', tag:'Corporativo', title:'RMT Empresarial — Post 2',
+    desc:'Post sobre a importância de manter uma rotina organizada no cuidado com os animais de estimação. Destaque para o aplicativo em lançamento.',
+    process:'Foco total na identidade visual. A foto da tutora abraçando o gato cria uma sensação de conforto e afeto. A palavra "ROTINA" ganha destaque máximo.',
+    colors:['#2C3E50','#E8B84B','#FFFFFF'] },
+  
+    { src:'../assets/rmt_empresarial/post3.png', tag:'Corporativo', title:'RMT Empresarial — Post 3',
+    desc:'Post produto para linha de e-bikes. Composição com o informativo de beneficios e gatilho de vendas em destaque sobre fundo escuro.',
+    process:'Layout dividido por uma linha diagonal criando dinamismo. A lista numerada reforça a sugestão de leitura sobre os diferenciais do produto.',
+    colors:['#1A1A2E','#00D4AA','#FFFFFF'] },
+  
+    { src:'../assets/rmt_empresarial_2/post1.png', tag:'Corporativo', title:'RMT Empresarial — Post 4',
+    desc:'Post com abordagem criativa mantendo reconhecimento e o posicionamento em tecnologia da marca.',
+    process:'A imagem do pôr do sol evoca uma sensação de liberdade e modernidade, enquanto o fundo composto pela cidade reforça a ideia de uso urbano. A fonte sem serifa branca e em caixa alta garante contraste.',
+    colors:['#003366','#00AAFF','#FFFFFF'] },
+  
+    { src:'../assets/rmt_empresarial_2/post2.png', tag:'Corporativo', title:'RMT Empresarial — Post 5',
+    desc:'Layout diferenciado para produto específico. Espaço negativo generoso dá respiro à composição e destaque total ao produto.',
+    process:'Fonte desenhada leve no topo para a frase de efeito de contraste. O texto centralizado é sustentado por uma linha fina, organizando a leitura de forma elegante.',
+    colors:['#1C1C1C','#C9A96E','#FFFFFF'] },
+];
+
+let currentIdx = 0;
+
+function buildInfo(p){
+  return `
+    <div class="lb-tag">${p.tag}</div>
+    <div class="lb-title">${p.title}</div>
+    <div class="lb-divider"></div>
+    <div>
+      <div class="lb-label">Sobre o post</div>
+      <div class="lb-text">${p.desc}</div>
+    </div>
+    <div>
+      <div class="lb-label">Processo criativo</div>
+      <div class="lb-text">${p.process}</div>
+    </div>
+    </div>`;
+}
+
+function openLightbox(idx){
+  currentIdx = idx;
+  const p = posts[idx];
+  document.getElementById('lb-img').src = p.src;
+  document.getElementById('lb-info').innerHTML = buildInfo(p);
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox(){
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function navLightbox(dir){
+  currentIdx = (currentIdx + dir + posts.length) % posts.length;
+  openLightbox(currentIdx);
+}
+
+// Close on backdrop click
+document.getElementById('lightbox').addEventListener('click', function(e){
+  if(e.target === this) closeLightbox();
+});
+
+// Keyboard nav
+document.addEventListener('keydown', e=>{
+  if(!document.getElementById('lightbox').classList.contains('open')) return;
+  if(e.key==='Escape') closeLightbox();
+  if(e.key==='ArrowLeft') navLightbox(-1);
+  if(e.key==='ArrowRight') navLightbox(1);
+});
+
+// Cursor
+const cur=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
+if(cur&&ring&&window.matchMedia('(pointer:fine)').matches){
+  let mx=0,my=0,rx=0,ry=0;
+  window.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+  (function loop(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;
+    cur.style.left=mx-5+'px';cur.style.top=my-5+'px';
+    ring.style.left=rx-18+'px';ring.style.top=ry-18+'px';
+    requestAnimationFrame(loop);})();
+}
+const io=new IntersectionObserver(e=>e.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target);}}),{threshold:.08});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>

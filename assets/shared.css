@@ -1,0 +1,87 @@
+/* shared.css — Sara Peres Portfolio */
+:root {
+  --teal: #3ecfb2; --cyan: #00c8e0; --coral: #f26b50;
+  --orange: #f5a623; --purple: #a474e0; --blue: #4a90d9;
+  --white: #ffffff; --off-white: rgba(255,255,255,0.85); --subtle: rgba(255,255,255,0.5);
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: 'Jost', sans-serif; background: #0a1628; color: #fff; overflow-x: hidden; }
+body::before {
+  content: ''; position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 9999; opacity: 0.4;
+}
+
+/* NAV */
+nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; padding: 1.4rem 4rem; background: rgba(10,22,40,0.6); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.07); }
+.nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 300; letter-spacing: 0.2em; color: #fff; text-decoration: none; }
+.nav-logo span { color: var(--teal); }
+.nav-links { display: flex; gap: 2rem; list-style: none; }
+.nav-links a { font-size: 0.75rem; font-weight: 300; letter-spacing: 0.2em; text-transform: uppercase; color: var(--subtle); text-decoration: none; transition: color 0.3s; }
+.nav-links a:hover, .nav-links a.active { color: #fff; }
+
+/* CURSOR */
+@media (pointer: fine) {
+  body { cursor: none; }
+  #cursor { width:10px;height:10px;background:var(--teal);border-radius:50%;position:fixed;pointer-events:none;z-index:99999;mix-blend-mode:screen; }
+  #cursor-ring { width:36px;height:36px;border:1px solid rgba(62,207,178,0.5);border-radius:50%;position:fixed;pointer-events:none;z-index:99998; }
+}
+
+/* PAGE HEADER */
+.page-header { padding: 12rem 4rem 6rem; text-align: center; position: relative; overflow: hidden; }
+.orb { position: absolute; border-radius: 50%; filter: blur(90px); pointer-events: none; }
+.page-header .orb-1 { width:600px;height:600px;background:radial-gradient(circle,var(--teal) 0%,transparent 70%);top:-150px;left:-150px;opacity:0.3; }
+.page-header .orb-2 { width:500px;height:500px;background:radial-gradient(circle,var(--coral) 0%,transparent 70%);top:-100px;right:-100px;opacity:0.35; }
+.page-header .orb-3 { width:400px;height:400px;background:radial-gradient(circle,var(--purple) 0%,transparent 70%);bottom:-50px;left:50%;transform:translateX(-50%);opacity:0.2; }
+
+.page-breadcrumb { font-size:0.68rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--teal);margin-bottom:1.2rem; }
+.page-breadcrumb a { color:var(--subtle);text-decoration:none; }
+.page-breadcrumb a:hover { color:var(--teal); }
+.page-title { font-family:'Cormorant Garamond',serif;font-size:clamp(3.5rem,8vw,8rem);font-weight:300;line-height:0.95;margin-bottom:1.5rem; }
+.page-title em { font-style:italic;color:var(--teal); }
+.page-subtitle { font-size:0.85rem;color:var(--subtle);font-weight:200;letter-spacing:0.05em;max-width:500px;margin:0 auto; }
+
+/* MAIN CONTENT */
+.page-content { padding: 4rem; max-width: 1200px; margin: 0 auto; }
+
+/* ANIMATIONS */
+@keyframes fadeUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+@keyframes gradShift { 0%{background-position:0% 50%} 100%{background-position:300% 50%} }
+@keyframes spinSpark { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+.reveal { opacity:0;transform:translateY(40px);transition:opacity 0.8s ease,transform 0.8s ease; }
+.reveal.visible { opacity:1;transform:translateY(0); }
+.reveal-d1 { transition-delay:0.1s; }
+.reveal-d2 { transition-delay:0.2s; }
+.reveal-d3 { transition-delay:0.3s; }
+.reveal-d4 { transition-delay:0.4s; }
+
+.grad-text { background:linear-gradient(90deg,var(--teal),var(--cyan),var(--purple),var(--coral),var(--orange),var(--teal));background-size:300% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:gradShift 6s linear infinite; }
+.spark { display:inline-block;width:12px;height:12px;background:var(--teal);clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);animation:spinSpark 4s linear infinite; }
+
+/* COLOR SWATCHES */
+.color-swatches { display:flex;gap:0.8rem;flex-wrap:wrap; }
+.color-swatch { display:flex;align-items:center;gap:0.5rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:100px;padding:0.3rem 0.8rem 0.3rem 0.3rem; }
+.swatch-dot { width:22px;height:22px;border-radius:50%;flex-shrink:0;border:1px solid rgba(255,255,255,0.15); }
+.swatch-hex { font-size:0.65rem;letter-spacing:0.1em;font-family:monospace;color:var(--subtle); }
+
+/* FOOTER */
+footer { background:#060e1c;border-top:1px solid rgba(255,255,255,0.05);padding:4rem;text-align:center;position:relative;overflow:hidden;margin-top:6rem; }
+footer .orb-f { width:500px;height:300px;background:radial-gradient(circle,#3ecfb2 0%,transparent 70%);top:-100px;left:50%;transform:translateX(-50%);opacity:0.1;position:absolute;border-radius:50%;filter:blur(90px); }
+.footer-inner { position:relative;z-index:1; }
+.footer-name { font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,5vw,4rem);font-weight:300; }
+.footer-tagline { font-size:0.72rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--subtle);margin-top:0.8rem;margin-bottom:2rem; }
+.footer-contact { display:flex;gap:3rem;justify-content:center;flex-wrap:wrap; }
+.fc-label { font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:rgba(255,255,255,0.3);display:block;margin-bottom:0.3rem; }
+.fc-val { font-size:0.85rem;color:var(--teal);text-decoration:none;font-weight:300; }
+.fc-val:hover { text-decoration:underline; }
+.footer-bottom { margin-top:3rem;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,0.04);font-size:0.62rem;letter-spacing:0.2em;color:rgba(255,255,255,0.2); }
+
+@media (max-width:900px) {
+  nav { padding:1.2rem 1.5rem; }
+  .nav-links { gap:1rem; }
+  .nav-links a { font-size:0.65rem; }
+  .page-header { padding:10rem 1.5rem 4rem; }
+  .page-content { padding:2rem 1.5rem; }
+  footer { padding:3rem 1.5rem; }
+}

@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Identidade Visual — Sara Peres</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../assets/shared.css"/>
+  <style>
+    /* PROJECT CARD */
+    .iv-project {
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.08);
+      overflow: hidden;
+      margin-bottom: 2.5rem;
+      background: rgba(255,255,255,0.02);
+      transition: border-color 0.4s;
+    }
+    .iv-project:hover { border-color: rgba(62,207,178,0.2); }
+
+    /* PREVIEW ROW */
+    .iv-preview {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      cursor: pointer;
+      position: relative;
+    }
+
+    /* FIX cover image: object-fit cover fills the space completely, no black bars */
+    .iv-cover {
+      height: 360px;
+      overflow: hidden;
+      position: relative;
+    }
+    /* FIX e-horizon: expand image to fill frame completely */
+    .iv-cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;   /* fills the box — edge-bleed is acceptable for backgrounds */
+      display: block;
+      transition: transform 0.6s cubic-bezier(0.23,1,0.32,1);
+    }
+    .iv-project:hover .iv-cover img { transform: scale(1.05); }
+
+   
+    .iv-preview-content {
+      padding: 2.5rem 2.5rem 2.5rem 3rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 1rem;
+    }
+    .iv-tag { font-size:0.65rem;letter-spacing:0.35em;text-transform:uppercase;color:var(--teal); }
+    .iv-title { font-family:'Cormorant Garamond',serif;font-size:2.5rem;font-weight:300;line-height:1; }
+    .iv-brief { font-size:0.85rem;color:var(--subtle);font-weight:200;line-height:1.7;max-width:400px; }
+    .iv-attrs { display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem; }
+    .attr-pill { padding:0.25rem 0.8rem;border-radius:100px;font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;background:rgba(255,255,255,0.05);color:var(--subtle);border:1px solid rgba(255,255,255,0.07); }
+    .iv-expand-btn { display:inline-flex;align-items:center;gap:0.5rem;margin-top:1rem;font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--teal);cursor:pointer;background:none;border:none;font-family:'Jost',sans-serif;transition:gap 0.3s;padding:0; }
+    .iv-expand-btn:hover { gap:1rem; }
+    .iv-expand-arrow { transition:transform 0.4s;display:inline-block; }
+    .iv-project.expanded .iv-expand-arrow { transform:rotate(180deg); }
+
+    /* EXPANDED */
+    .iv-expanded {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.9s cubic-bezier(0.23,1,0.32,1);
+    }
+    .iv-project.expanded .iv-expanded { max-height: 1700px; }
+
+    .iv-expanded-inner {
+      padding: 2.5rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    /* GALLERY: no cropping — each item uses its natural aspect ratio */
+    .iv-gallery {
+      display: grid;
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+    /* 2-column gallery for most items */
+    .iv-gallery-2col { grid-template-columns: 1fr 1fr; }
+    /* 3-column for smaller items */
+    .iv-gallery-3col { grid-template-columns: 1fr 1fr 1fr; }
+
+    .iv-gallery-item {
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+      background: rgba(0,0,0,0.4);
+      cursor: pointer;
+    }
+    /* FIX: contain images so nothing gets cropped */
+    .iv-gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      max-height: 300px;
+      background: rgba(0,0,0,0.3);
+    }
+    /* For landscape images — auto height */
+    .iv-gallery-item.natural img {
+      height: auto;
+      max-height: none;
+    }
+
+    /* Hover blur on gallery items */
+    .gallery-overlay {
+      position:absolute;inset:0;
+      background:rgba(10,22,40,0.88);
+      backdrop-filter:blur(8px);
+      display:flex;align-items:center;justify-content:center;
+      opacity:0;transition:opacity 0.35s;
+      padding:1.5rem;text-align:center;
+    }
+    .iv-gallery-item:hover .gallery-overlay { opacity:1; }
+    .gallery-caption { font-size:0.78rem;color:rgba(255,255,255,0.8);font-weight:200;line-height:1.6; }
+
+    /* INFO */
+    .iv-info-grid { display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem; }
+    .iv-info-label { font-size:0.62rem;letter-spacing:0.35em;text-transform:uppercase;color:var(--teal);margin-bottom:0.7rem; }
+    .iv-info-text { font-size:0.82rem;font-weight:200;line-height:1.8;color:var(--off-white); }
+
+    @media(max-width:900px){
+      .iv-preview{grid-template-columns:1fr;}
+      .iv-cover{height:260px;}
+      .iv-gallery-2col{grid-template-columns:1fr;}
+      .iv-gallery-3col{grid-template-columns:1fr 1fr;}
+      .iv-info-grid{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<nav>
+  <a href="../index.html" class="nav-logo">Sara <span>Peres</span></a>
+  <ul class="nav-links">
+    <li><a href="../index.html#sobre">Sobre</a></li>
+    <li><a href="../index.html#projetos">Projetos</a></li>
+    <li><a href="logofólio.html">Logofólio</a></li>
+    <li><a href="identidade-visual.html" class="active">Identidade Visual</a></li>
+    <li><a href="social-media.html">Social Media</a></li>
+    <li><a href="../index.html#contato">Contato</a></li>
+  </ul>
+</nav>
+
+<div class="page-header">
+  <div class="orb orb-1" style="background:radial-gradient(circle,#4a90d9 0%,transparent 70%);"></div>
+  <div class="orb orb-2" style="background:radial-gradient(circle,#00c8e0 0%,transparent 70%);"></div>
+  <div class="orb orb-3"></div>
+  <p class="page-breadcrumb"><a href="../index.html">Home</a> &nbsp;/&nbsp; Identidade Visual</p>
+  <h1 class="page-title"><em>Identidade</em> Visual</h1>
+  <p class="page-subtitle">Sistemas de marca completos com logo, paleta, aplicações e mockups. Clique em cada projeto para expandir.</p>
+</div>
+
+<div class="page-content">
+
+  <!-- ── BR BIKE ── -->
+  <div class="iv-project reveal" id="proj-brbike">
+    <div class="iv-preview" onclick="toggleProject('proj-brbike')">
+      <div class="iv-cover">
+        <img src="../assets/br_bike/logo.png" alt="BR Bike Logo"/>
+      </div>
+      <div class="iv-preview-content">
+        <span class="iv-tag">✦ Identidade Visual · 2025</span>
+        <h2 class="iv-title">BR Bike</h2>
+        <p class="iv-brief">Sistema de marca completo para empresa de bicicletas elétricas. Do logo às aplicações físicas — cartão de visita, fachada, uniformes e adesivos.</p>
+        <div class="iv-attrs">
+          <span class="attr-pill">Velocidade</span>
+          <span class="attr-pill">Energia</span>
+          <span class="attr-pill">Sustentabilidade</span>
+          <span class="attr-pill">Tecnologia</span>
+        </div>
+        <button class="iv-expand-btn">Ver projeto completo <span class="iv-expand-arrow">↓</span></button>
+      </div>
+    </div>
+    <div class="iv-expanded">
+      <div class="iv-expanded-inner">
+
+        <!-- Fachada — grande, ocupa largura total -->
+        <div class="iv-gallery iv-gallery-2col" style="grid-template-columns:1fr;margin-bottom:1rem;">
+          <div class="iv-gallery-item natural">
+            <img src="../assets/br_bike/lugar.png" alt="BR Bike Fachada"/>
+            <div class="gallery-overlay"><span class="gallery-caption">Mockup de fachada — presença impactante no ponto de venda com a identidade em escala real</span></div>
+          </div>
+        </div>
+
+        <!-- Cartões + Camisa + Adesivo -->
+        <div class="iv-gallery iv-gallery-3col" style="margin-bottom:2.5rem;">
+          <div class="iv-gallery-item">
+            <img src="../assets/br_bike/cartao_frente.png" alt="Cartão Frente"/>
+            <div class="gallery-overlay"><span class="gallery-caption">Cartão de visita — frente com logo e paleta principal</span></div>
+          </div>
+          <div class="iv-gallery-item">
+            <img src="../assets/br_bike/cartao_tras.png" alt="Cartão Verso"/>
+            <div class="gallery-overlay"><span class="gallery-caption">Cartão de visita — verso com dados de contato estruturados</span></div>
+          </div>
+          <div class="iv-gallery-item">
+            <img src="../assets/br_bike/camisa.png" alt="Camisa BR Bike"/>
+            <div class="gallery-overlay"><span class="gallery-caption">Uniforme operacional — aplicação da marca em camiseta</span></div>
+          </div>
+          <div class="iv-gallery-item" style="grid-column:span 3;">
+            <img src="../assets/br_bike/adesivo.png" alt="Adesivo BR Bike" style="max-height:140px;"/>
+            <div class="gallery-overlay"><span class="gallery-caption">Adesivo circular — versão compacta da marca para aplicação em produtos e veículos</span></div>
+          </div>
+        </div>
+
+        <div class="iv-info-grid">
+          <div>
+            <div class="iv-info-label">Conceito</div>
+            <div class="iv-info-text">Velocidade e inovação como pilares visuais. A identidade transmite energia e tecnologia com minimalismo — garantindo versatilidade em todas as aplicações, do digital ao físico.</div>
+          </div>
+          <div>
+            <div class="iv-info-label">Processo</div>
+            <div class="iv-info-text">Desenvolvido a partir de briefing focado em mobilidade elétrica urbana. O símbolo une bicicleta e raio elétrico em uma leitura imediata do produto, com tipografia geométrica de alto impacto.</div>
+          </div>
+          <div>
+            <div class="iv-info-label">Paleta de Cores</div>
+            <div class="color-swatches">
+              <div class="color-swatch"><div class="swatch-dot" style="background:#111111;"></div><span class="swatch-hex">#111111</span></div>
+              <div class="color-swatch"><div class="swatch-dot" style="background:#FAC709;"></div><span class="swatch-hex">#FAC709</span></div>
+              <div class="color-swatch"><div class="swatch-dot" style="background:#009440;"></div><span class="swatch-hex">#009440</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── E-HORIZON ── -->
+  <div class="iv-project reveal" id="proj-ehorizon">
+    <div class="iv-preview" onclick="toggleProject('proj-ehorizon')">
+      <!-- FIX: use contain-logo class so the logo fills the dark bg without black bars -->
+      <div class="iv-cover contain-logo">
+        <img src="../assets/e-horizon/logo.png" alt="E-Horizon Logo"/>
+      </div>
+      <div class="iv-preview-content">
+        <span class="iv-tag">✦ Identidade Visual · 2026</span>
+        <h2 class="iv-title">E-Horizon Studio</h2>
+        <p class="iv-brief">Identidade para estúdio de gaming e esports. E-Horizon significa "Event Horizon" — o horizonte de eventos de um buraco negro, o ponto de não retorno. A marca foi construída para representar esse colapso gravitacional: inevitável, intenso e magnético.</p>
+        <div class="iv-attrs">
+          <span class="attr-pill">Gaming</span>
+          <span class="attr-pill">Esports</span>
+          <span class="attr-pill">Tech</span>
+          <span class="attr-pill">Digital</span>
+        </div>
+        <button class="iv-expand-btn">Ver projeto completo <span class="iv-expand-arrow">↓</span></button>
+      </div>
+    </div>
+    <div class="iv-expanded">
+      <div class="iv-expanded-inner">
+
+        <!-- Games banner — no crop, natural -->
+        <div class="iv-gallery" style="grid-template-columns:1fr;margin-bottom:1rem;">
+          <div class="iv-gallery-item natural">
+            <img src="../assets/e-horizon/games.png" alt="E-Horizon Games Banner"/>
+            <div class="gallery-overlay"><span class="gallery-caption">Aplicação gaming — banner para plataforma de esports, identidade em contexto competitivo</span></div>
+          </div>
+        </div>
+
+        <!-- Mockup + Banner vertical — natural sizes side by side -->
+        <div class="iv-gallery iv-gallery-2col" style="margin-bottom:2.5rem;align-items:start;">
+          <div class="iv-gallery-item natural">
+            <img src="../assets/e-horizon/mockup.png" alt="E-Horizon Mockup" style="width:100%;height:auto;max-height:none;"/>
+            <div class="gallery-overlay"><span class="gallery-caption">Mockup de aplicação — visão geral completa da identidade em uso</span></div>
+          </div>
+          <div class="iv-gallery-item natural">
+            <img src="../assets/e-horizon/banner.jpg" alt="E-Horizon Banner YouTube" style="width:100%;height:auto;max-height:none;"/>
+            <div class="gallery-overlay"><span class="gallery-caption">Banner YouTube eSports — identidade aplicada em formato vertical para canal de esports</span></div>
+          </div>
+        </div>
+
+        <div class="iv-info-grid">
+          <div>
+            <div class="iv-info-label">Conceito — Event Horizon</div>
+            <div class="iv-info-text">O horizonte de eventos é o ponto de não retorno de um buraco negro — tudo que cruza esse limiar é inevitavelmente atraído. A marca captura essa força: o círculo em colapso com linhas de velocidade representa o campo gravitacional da marca, que atrai e retém sua audiência.</div>
+          </div>
+          <div>
+            <div class="iv-info-label">Processo</div>
+            <div class="iv-info-text">O projeto partiu da física do buraco negro como metáfora de dominância no espaço competitivo. A tipografia display geométrica bold reforça o caráter ousado. A paleta azul-roxo-ciano remete ao espaço profundo e a telas de alta tecnologia.</div>
+          </div>
+          <div>
+            <div class="iv-info-label">Paleta de Cores</div>
+            <div class="color-swatches">
+              <div class="color-swatch"><div class="swatch-dot" style="background:#3D00EF;"></div><span class="swatch-hex">#3D00EF</span></div>
+              <div class="color-swatch"><div class="swatch-dot" style="background:#2A00B1;"></div><span class="swatch-hex">#2A00B1</span></div>
+              <div class="color-swatch"><div class="swatch-dot" style="background:#00E8FF;"></div><span class="swatch-hex">#00E8FF</span></div>
+              <div class="color-swatch"><div class="swatch-dot" style="background:#FFFFFF;border-color:rgba(200,200,200,0.4);"></div><span class="swatch-hex">#FFFFFF</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="orb-f"></div>
+  <div class="footer-inner">
+    <div class="footer-name grad-text">Sara Peres</div>
+    <p class="footer-tagline">Design Gráfico Júnior · Goiânia, GO</p>
+    <div class="footer-contact">
+      <div><span class="fc-label">E-mail</span><a href="mailto:saraperes190@gmail.com" class="fc-val">saraperes190@gmail.com</a></div>
+      <div><span class="fc-label">WhatsApp</span><a href="https://wa.me/5562995504704" class="fc-val">(62) 99550-4704</a></div>
+    </div>
+    <div class="footer-bottom">© 2025 Sara Peres de Souza · Todos os direitos reservados</div>
+  </div>
+</footer>
+
+<script>
+  function toggleProject(id){
+    const el=document.getElementById(id);
+    el.classList.toggle('expanded');
+    if(el.classList.contains('expanded'))
+      setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),100);
+  }
+  const cur=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
+  if(cur&&ring&&window.matchMedia('(pointer:fine)').matches){
+    let mx=0,my=0,rx=0,ry=0;
+    window.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+    (function loop(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;
+      cur.style.left=mx-5+'px';cur.style.top=my-5+'px';
+      ring.style.left=rx-18+'px';ring.style.top=ry-18+'px';
+      requestAnimationFrame(loop);})();
+  }
+  const io=new IntersectionObserver(e=>e.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target);}}),{threshold:.1});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>

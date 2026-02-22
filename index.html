@@ -7,1079 +7,279 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --teal: #3ecfb2;
-      --cyan: #00c8e0;
-      --coral: #f26b50;
-      --orange: #f5a623;
-      --purple: #a474e0;
-      --blue: #4a90d9;
-      --yellow: #f5d060;
-      --green: #4cbb8a;
-      --white: #ffffff;
-      --off-white: rgba(255,255,255,0.85);
-      --subtle: rgba(255,255,255,0.5);
+      --teal:#3ecfb2;--cyan:#00c8e0;--coral:#f26b50;
+      --orange:#f5a623;--purple:#a474e0;
+      --off-white:rgba(255,255,255,0.85);--subtle:rgba(255,255,255,0.5);
     }
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+    html{scroll-behavior:smooth;}
+    body{font-family:'Jost',sans-serif;background:#0a1628;color:#fff;overflow-x:hidden;}
+    body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:0.4;}
 
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    nav{position:fixed;top:0;left:0;right:0;z-index:1000;display:flex;justify-content:space-between;align-items:center;padding:1.4rem 4rem;background:rgba(10,22,40,0.6);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.07);}
+    .nav-logo{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:300;letter-spacing:0.2em;color:#fff;text-decoration:none;}
+    .nav-logo span{color:var(--teal);}
+    .nav-links{display:flex;gap:2rem;list-style:none;}
+    .nav-links a{font-size:0.75rem;font-weight:300;letter-spacing:0.2em;text-transform:uppercase;color:var(--subtle);text-decoration:none;transition:color .3s;}
+    .nav-links a:hover{color:#fff;}
 
-    html { scroll-behavior: smooth; }
+    @media(pointer:fine){body{cursor:none;}#cursor{width:10px;height:10px;background:var(--teal);border-radius:50%;position:fixed;pointer-events:none;z-index:99999;mix-blend-mode:screen;}#cursor-ring{width:36px;height:36px;border:1px solid rgba(62,207,178,.5);border-radius:50%;position:fixed;pointer-events:none;z-index:99998;}}
 
-    body {
-      font-family: 'Jost', sans-serif;
-      background: #0a1628;
-      color: var(--white);
-      overflow-x: hidden;
-    }
+    @keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes scrollPulse{0%,100%{opacity:.3}50%{opacity:.9}}
+    @keyframes gradShift{0%{background-position:0% 50%}100%{background-position:300% 50%}}
+    @keyframes spinSpark{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
 
-    /* ─── NOISE TEXTURE OVERLAY ─── */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 9999;
-      opacity: 0.4;
-    }
+    .reveal{opacity:0;transform:translateY(40px);transition:opacity .8s ease,transform .8s ease;}
+    .reveal.visible{opacity:1;transform:translateY(0);}
+    .reveal-delay-1{transition-delay:.12s;}
+    .reveal-delay-2{transition-delay:.24s;}
+    .reveal-delay-3{transition-delay:.36s;}
+    .grad-text{background:linear-gradient(90deg,var(--teal),var(--cyan),var(--purple),var(--coral),var(--orange),var(--teal));background-size:300% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:gradShift 6s linear infinite;}
+    .spark{display:inline-block;width:12px;height:12px;background:var(--teal);clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);animation:spinSpark 4s linear infinite;}
+    .orb{position:absolute;border-radius:50%;filter:blur(90px);pointer-events:none;}
+    section{min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
 
-    /* ─── NAVIGATION ─── */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 1000;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1.4rem 4rem;
-      background: rgba(10,22,40,0.5);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-    }
+    /* HERO */
+    #hero{flex-direction:column;text-align:center;padding:8rem 2rem 4rem;}
+    #hero .orb-1{width:700px;height:700px;background:radial-gradient(circle,#3ecfb2 0%,transparent 70%);top:-150px;left:-200px;opacity:.4;}
+    #hero .orb-2{width:600px;height:600px;background:radial-gradient(circle,#f26b50 0%,transparent 70%);top:-80px;right:-100px;opacity:.5;}
+    #hero .orb-3{width:500px;height:500px;background:radial-gradient(circle,#f5a623 0%,transparent 70%);bottom:0;left:40%;opacity:.3;}
+    #hero .orb-4{width:400px;height:400px;background:radial-gradient(circle,#a474e0 0%,transparent 70%);bottom:50px;right:5%;opacity:.25;}
+    .hero-eyebrow{font-size:.72rem;letter-spacing:.35em;text-transform:uppercase;color:var(--teal);margin-bottom:1.5rem;opacity:0;animation:fadeUp .8s .2s forwards;}
+    .hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(5rem,12vw,11rem);font-weight:300;line-height:.9;letter-spacing:-.02em;opacity:0;animation:fadeUp .9s .4s forwards;}
+    .hero-subtitle{font-size:.9rem;font-weight:200;letter-spacing:.3em;text-transform:uppercase;color:var(--subtle);margin-top:1.8rem;opacity:0;animation:fadeUp .9s .6s forwards;}
+    .hero-cta{display:inline-flex;align-items:center;gap:.7rem;margin-top:3.5rem;padding:.9rem 2.4rem;border:1px solid rgba(255,255,255,.25);border-radius:100px;font-size:.78rem;letter-spacing:.2em;text-transform:uppercase;color:#fff;text-decoration:none;backdrop-filter:blur(10px);background:rgba(255,255,255,.06);transition:all .3s;opacity:0;animation:fadeUp .9s .8s forwards;}
+    .hero-cta:hover{background:rgba(62,207,178,.2);border-color:var(--teal);}
 
-    .nav-logo {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.4rem;
-      font-weight: 300;
-      letter-spacing: 0.2em;
-      color: var(--white);
-      text-decoration: none;
-    }
-    .nav-logo span { color: var(--teal); }
+    /* FIX scroll-hint: full-width so it truly centers */
+    .scroll-hint{position:absolute;bottom:2.5rem;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:.5rem;font-size:.65rem;letter-spacing:.3em;text-transform:uppercase;color:var(--subtle);opacity:0;animation:fadeUp 1s 1.2s forwards;}
+    .scroll-line{width:1px;height:50px;background:linear-gradient(to bottom,rgba(255,255,255,.5),transparent);animation:scrollPulse 2s ease-in-out infinite;}
 
-    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
-    .nav-links a {
-      font-size: 0.78rem;
-      font-weight: 300;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--subtle);
-      text-decoration: none;
-      transition: color 0.3s;
-    }
-    .nav-links a:hover { color: var(--white); }
+    /* SOBRE */
+    #sobre{padding:6rem 4rem;background:#0a1628;}
+    #sobre .orb-1{width:600px;height:600px;background:radial-gradient(circle,#3ecfb2 0%,transparent 70%);top:-100px;right:-200px;opacity:.2;}
+    #sobre .orb-2{width:500px;height:500px;background:radial-gradient(circle,#4a90d9 0%,transparent 70%);bottom:-100px;left:-100px;opacity:.16;}
+    .sobre-grid{display:grid;grid-template-columns:1fr 1fr;gap:6rem;max-width:1100px;align-items:center;position:relative;z-index:1;}
+    .sobre-img-wrap{position:relative;}
+    .sobre-img-wrap::before{content:'';position:absolute;inset:-3px;background:linear-gradient(135deg,var(--teal),var(--coral),var(--purple));border-radius:4px;z-index:-1;}
+    /* FIX: show Sara's face correctly — object-position top, cropped image already corrected */
+    .sobre-img{width:100%;aspect-ratio:3/4;object-fit:cover;object-position:center top;display:block;border-radius:2px;}
+    .section-label{font-size:.68rem;letter-spacing:.4em;text-transform:uppercase;color:var(--teal);margin-bottom:1.2rem;display:block;}
+    .section-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2.5rem,5vw,4.5rem);font-weight:300;line-height:1.05;margin-bottom:2rem;}
+    .section-title em{font-style:italic;color:var(--teal);}
+    .sobre-text{font-size:1rem;font-weight:200;line-height:1.9;color:var(--off-white);margin-bottom:1.5rem;}
+    .sobre-info{display:flex;flex-direction:column;gap:.7rem;font-size:.82rem;font-weight:300;color:var(--subtle);}
+    .sobre-info a{color:var(--teal);text-decoration:none;}
+    .sobre-info a:hover{text-decoration:underline;}
+    .skills-list{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:2rem;}
+    .skill-tag{padding:.35rem 1rem;border:1px solid rgba(62,207,178,.35);border-radius:100px;font-size:.72rem;letter-spacing:.15em;color:var(--teal);text-transform:uppercase;}
 
-    /* ─── SECTIONS ─── */
-    section {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-    }
+    /* PROJETOS */
+    #projetos{flex-direction:column;padding:8rem 4rem;background:linear-gradient(180deg,#0a1628 0%,#0c1a30 100%);}
+    #projetos .orb-1{width:700px;height:700px;background:radial-gradient(circle,#f26b50 0%,transparent 70%);top:0;right:-300px;opacity:.1;}
+    #projetos .orb-2{width:600px;height:600px;background:radial-gradient(circle,#3ecfb2 0%,transparent 70%);bottom:0;left:-300px;opacity:.1;}
+    .section-header{text-align:center;margin-bottom:5rem;position:relative;z-index:1;}
+    .divider-line{width:60px;height:1px;background:linear-gradient(to right,transparent,var(--teal),transparent);margin:1.5rem auto 0;}
+    .project-categories{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;max-width:1100px;width:100%;position:relative;z-index:1;}
 
-    /* ─── GRADIENT ORBS (reusable mesh background) ─── */
-    .orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(90px);
-      pointer-events: none;
-    }
+    /* FIX category cards: warm palette matching site aesthetic */
+    .category-card{display:block;text-decoration:none;border-radius:4px;overflow:hidden;position:relative;cursor:pointer;transition:all .5s cubic-bezier(.23,1,.32,1);padding:3rem 2.5rem 2.5rem;min-height:300px;}
+    .card-bg{position:absolute;inset:0;transition:opacity .5s;pointer-events:none;}
 
-    /* ─── HERO ─── */
-    #hero {
-      flex-direction: column;
-      text-align: center;
-      padding: 8rem 2rem 4rem;
-    }
+    .cat-logos{background:linear-gradient(145deg,#0d2520,#091c18 60%,#0a1628);border:1px solid rgba(62,207,178,.14);}
+    .cat-logos:hover{border-color:rgba(62,207,178,.45);box-shadow:0 30px 80px rgba(62,207,178,.12);transform:translateY(-8px);}
+    .cat-logos .card-bg{background:radial-gradient(ellipse at 90% 10%,rgba(62,207,178,.22) 0%,transparent 65%);}
+    .cat-logos .cat-number,.cat-logos .cat-icon,.cat-logos .cat-arrow{color:var(--teal);}
 
-    #hero .orb-1 { width: 700px; height: 700px; background: radial-gradient(circle, #3ecfb2 0%, transparent 70%); top: -150px; left: -200px; opacity: 0.45; }
-    #hero .orb-2 { width: 600px; height: 600px; background: radial-gradient(circle, #f26b50 0%, transparent 70%); top: -80px; right: -100px; opacity: 0.55; }
-    #hero .orb-3 { width: 500px; height: 500px; background: radial-gradient(circle, #f5a623 0%, transparent 70%); bottom: 0; left: 40%; opacity: 0.35; }
-    #hero .orb-4 { width: 400px; height: 400px; background: radial-gradient(circle, #a474e0 0%, transparent 70%); bottom: 50px; right: 5%; opacity: 0.3; }
+    .cat-identidade{background:linear-gradient(145deg,#231208,#180e06 60%,#0a1628);border:1px solid rgba(242,107,80,.14);}
+    .cat-identidade:hover{border-color:rgba(242,107,80,.45);box-shadow:0 30px 80px rgba(242,107,80,.12);transform:translateY(-8px);}
+    .cat-identidade .card-bg{background:radial-gradient(ellipse at 90% 10%,rgba(242,107,80,.24) 0%,transparent 65%);}
+    .cat-identidade .cat-number,.cat-identidade .cat-icon,.cat-identidade .cat-arrow{color:var(--coral);}
 
-    .hero-eyebrow {
-      font-size: 0.72rem;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-      color: var(--teal);
-      margin-bottom: 1.5rem;
-      opacity: 0;
-      animation: fadeUp 0.8s 0.2s forwards;
-    }
+    .cat-social{background:linear-gradient(145deg,#211904,#181304 60%,#0a1628);border:1px solid rgba(245,166,35,.14);}
+    .cat-social:hover{border-color:rgba(245,166,35,.45);box-shadow:0 30px 80px rgba(245,166,35,.12);transform:translateY(-8px);}
+    .cat-social .card-bg{background:radial-gradient(ellipse at 90% 10%,rgba(245,166,35,.24) 0%,transparent 65%);}
+    .cat-social .cat-number,.cat-social .cat-icon,.cat-social .cat-arrow{color:var(--orange);}
 
-    .hero-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(5rem, 12vw, 11rem);
-      font-weight: 300;
-      line-height: 0.9;
-      letter-spacing: -0.02em;
-      color: var(--white);
-      opacity: 0;
-      animation: fadeUp 0.9s 0.4s forwards;
-    }
+    .cat-number{font-family:'Cormorant Garamond',serif;font-size:4rem;font-weight:300;line-height:1;margin-bottom:1rem;position:relative;z-index:1;opacity:.3;}
+    .cat-icon{font-size:2rem;margin-bottom:1.5rem;position:relative;z-index:1;animation:float 3s ease-in-out infinite;display:block;}
+    .cat-title{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300;margin-bottom:.8rem;position:relative;z-index:1;color:#fff;}
+    .cat-desc{font-size:.82rem;color:rgba(255,255,255,.5);font-weight:200;line-height:1.7;position:relative;z-index:1;}
+    .cat-arrow{display:inline-flex;align-items:center;gap:.5rem;margin-top:2rem;font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;position:relative;z-index:1;transition:gap .3s;}
+    .category-card:hover .cat-arrow{gap:1rem;}
 
-    .hero-title .accent { color: var(--teal); font-style: italic; }
+    /* LOGOFÓLIO PREVIEW */
+    #logofólio{flex-direction:column;padding:8rem 4rem;background:linear-gradient(180deg,#0c1a30,#0a1628);}
+    #logofólio .orb-1{width:700px;height:700px;background:radial-gradient(circle,#f26b50 0%,transparent 70%);top:0;right:-200px;opacity:.1;}
+    #logofólio .orb-2{width:600px;height:600px;background:radial-gradient(circle,#3ecfb2 0%,transparent 70%);bottom:0;left:-200px;opacity:.1;}
+    .logo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;max-width:1100px;width:100%;position:relative;z-index:1;}
+    .logo-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:4px;padding:2.5rem 2rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.2rem;text-align:center;transition:all .4s;position:relative;overflow:hidden;cursor:default;}
+    .logo-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(62,207,178,.05),rgba(242,107,80,.05));opacity:0;transition:opacity .4s;}
+    .logo-card:hover{transform:translateY(-6px);border-color:rgba(62,207,178,.25);}
+    .logo-card:hover::before{opacity:1;}
+    .logo-img{max-height:80px;max-width:150px;object-fit:contain;}
+    .logo-name{font-size:.72rem;letter-spacing:.3em;text-transform:uppercase;color:var(--subtle);}
+    .logo-year{font-size:.62rem;letter-spacing:.2em;color:rgba(255,255,255,.25);}
 
-    .hero-subtitle {
-      font-size: 0.9rem;
-      font-weight: 200;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--subtle);
-      margin-top: 1.8rem;
-      opacity: 0;
-      animation: fadeUp 0.9s 0.6s forwards;
-    }
+    /* FOOTER */
+    footer{background:#060e1c;border-top:1px solid rgba(255,255,255,.05);padding:5rem 4rem;text-align:center;position:relative;overflow:hidden;}
+    footer .orb-1{width:500px;height:300px;background:radial-gradient(circle,#3ecfb2 0%,transparent 70%);top:-100px;left:50%;transform:translateX(-50%);opacity:.1;}
+    .footer-name{font-family:'Cormorant Garamond',serif;font-size:clamp(3rem,8vw,7rem);font-weight:300;letter-spacing:-.02em;line-height:1;position:relative;z-index:1;}
+    .footer-tagline{font-size:.75rem;letter-spacing:.35em;text-transform:uppercase;color:var(--subtle);margin-top:1rem;margin-bottom:3rem;position:relative;z-index:1;}
+    .footer-contact{display:flex;gap:3rem;justify-content:center;position:relative;z-index:1;flex-wrap:wrap;}
+    .footer-contact-item{display:flex;flex-direction:column;gap:.3rem;}
+    .footer-contact-label{font-size:.62rem;letter-spacing:.3em;text-transform:uppercase;color:rgba(255,255,255,.3);}
+    .footer-contact-value{font-size:.88rem;color:var(--teal);text-decoration:none;font-weight:300;}
+    .footer-contact-value:hover{text-decoration:underline;}
+    .footer-bottom{margin-top:4rem;padding-top:2rem;border-top:1px solid rgba(255,255,255,.04);font-size:.65rem;letter-spacing:.2em;color:rgba(255,255,255,.2);position:relative;z-index:1;}
 
-    .hero-cta {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.7rem;
-      margin-top: 3.5rem;
-      padding: 0.9rem 2.4rem;
-      border: 1px solid rgba(255,255,255,0.3);
-      border-radius: 100px;
-      font-size: 0.78rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--white);
-      text-decoration: none;
-      backdrop-filter: blur(10px);
-      background: rgba(255,255,255,0.06);
-      transition: all 0.3s;
-      opacity: 0;
-      animation: fadeUp 0.9s 0.8s forwards;
-    }
-    .hero-cta:hover { background: rgba(62,207,178,0.2); border-color: var(--teal); }
-
-    .scroll-hint {
-      position: absolute;
-      bottom: 2.5rem;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.65rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--subtle);
-      opacity: 0;
-      animation: fadeUp 1s 1.2s forwards;
-    }
-    .scroll-line {
-      width: 1px; height: 50px;
-      background: linear-gradient(to bottom, rgba(255,255,255,0.4), transparent);
-      animation: scrollPulse 2s infinite;
-    }
-
-    /* ─── SOBRE MIM ─── */
-    #sobre {
-      padding: 6rem 4rem;
-      background: #0a1628;
-    }
-    #sobre .orb-1 { width: 600px; height: 600px; background: radial-gradient(circle, #3ecfb2 0%, transparent 70%); top: -100px; right: -200px; opacity: 0.3; }
-    #sobre .orb-2 { width: 500px; height: 500px; background: radial-gradient(circle, #4a90d9 0%, transparent 70%); bottom: -100px; left: -100px; opacity: 0.25; }
-
-    .sobre-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6rem;
-      max-width: 1100px;
-      align-items: center;
-      position: relative;
-      z-index: 1;
-    }
-
-    .sobre-img-wrap {
-      position: relative;
-    }
-    .sobre-img-wrap::before {
-      content: '';
-      position: absolute;
-      inset: -3px;
-      background: linear-gradient(135deg, var(--teal), var(--coral), var(--purple));
-      border-radius: 2px;
-      z-index: -1;
-    }
-    .sobre-img {
-      width: 100%;
-      aspect-ratio: 3/4;
-      object-fit: cover;
-      display: block;
-      filter: saturate(0.9);
-    }
-    .sobre-img-placeholder {
-      width: 100%;
-      aspect-ratio: 3/4;
-      background: linear-gradient(135deg, rgba(62,207,178,0.3) 0%, rgba(74,144,217,0.3) 50%, rgba(164,116,224,0.3) 100%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 1rem;
-    }
-
-    .sobre-content {}
-    .section-label {
-      font-size: 0.68rem;
-      letter-spacing: 0.4em;
-      text-transform: uppercase;
-      color: var(--teal);
-      margin-bottom: 1.2rem;
-    }
-    .section-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(2.5rem, 5vw, 4.5rem);
-      font-weight: 300;
-      line-height: 1.05;
-      margin-bottom: 2rem;
-    }
-    .section-title em { font-style: italic; color: var(--teal); }
-
-    .sobre-text {
-      font-size: 1rem;
-      font-weight: 200;
-      line-height: 1.9;
-      color: var(--off-white);
-      margin-bottom: 2rem;
-    }
-
-    .sobre-info {
-      display: flex;
-      flex-direction: column;
-      gap: 0.7rem;
-      font-size: 0.82rem;
-      font-weight: 300;
-      color: var(--subtle);
-    }
-    .sobre-info a { color: var(--teal); text-decoration: none; }
-    .sobre-info a:hover { text-decoration: underline; }
-
-    .skills-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.6rem;
-      margin-top: 2rem;
-    }
-    .skill-tag {
-      padding: 0.35rem 1rem;
-      border: 1px solid rgba(62,207,178,0.4);
-      border-radius: 100px;
-      font-size: 0.72rem;
-      letter-spacing: 0.15em;
-      color: var(--teal);
-      text-transform: uppercase;
-    }
-
-    /* ─── SECTION DIVIDERS ─── */
-    .section-header {
-      text-align: center;
-      margin-bottom: 5rem;
-      position: relative;
-      z-index: 1;
-    }
-    .section-header .section-label { display: block; margin-bottom: 1rem; }
-    .section-header .section-title { display: block; }
-    .divider-line {
-      width: 60px; height: 1px;
-      background: linear-gradient(to right, transparent, var(--teal), transparent);
-      margin: 1.5rem auto 0;
-    }
-
-    /* ─── LOGOFÓLIO ─── */
-    #logofólio {
-      flex-direction: column;
-      padding: 8rem 4rem;
-      background: linear-gradient(180deg, #0a1628 0%, #0d1f3c 100%);
-    }
-    #logofólio .orb-1 { width: 700px; height: 700px; background: radial-gradient(circle, #f26b50 0%, transparent 70%); top: 0; right: -200px; opacity: 0.2; }
-    #logofólio .orb-2 { width: 600px; height: 600px; background: radial-gradient(circle, #3ecfb2 0%, transparent 70%); bottom: 0; left: -200px; opacity: 0.2; }
-
-    .logo-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.5rem;
-      max-width: 1100px;
-      width: 100%;
-      position: relative;
-      z-index: 1;
-    }
-
-    .logo-card {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 4px;
-      padding: 3rem 2rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 1.2rem;
-      text-align: center;
-      transition: all 0.4s;
-      position: relative;
-      overflow: hidden;
-      cursor: default;
-    }
-    .logo-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(62,207,178,0.05) 0%, rgba(242,107,80,0.05) 100%);
-      opacity: 0;
-      transition: opacity 0.4s;
-    }
-    .logo-card:hover { transform: translateY(-6px); border-color: rgba(62,207,178,0.3); }
-    .logo-card:hover::before { opacity: 1; }
-
-    .logo-visual {
-      font-size: 1.5rem;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      line-height: 1.2;
-    }
-    .logo-name {
-      font-size: 0.72rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--subtle);
-    }
-    .logo-year {
-      font-size: 0.65rem;
-      letter-spacing: 0.2em;
-      color: rgba(255,255,255,0.3);
-    }
-
-    /* Logo visuals */
-    .lv-ehorizon {
-      font-family: 'Jost', sans-serif;
-      font-weight: 600;
-      letter-spacing: 0.12em;
-      font-size: 1.1rem;
-      background: linear-gradient(90deg, #00c8e0, #a474e0);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .lv-brbike {
-      font-family: 'Jost', sans-serif;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      font-size: 1.2rem;
-      color: #4cbb8a;
-    }
-    .lv-jefferson {
-      font-family: 'Cormorant Garamond', serif;
-      font-style: italic;
-      font-size: 1.6rem;
-      color: var(--off-white);
-    }
-    .lv-plume {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.4rem;
-      color: var(--off-white);
-      letter-spacing: 0.05em;
-    }
-    .lv-neetech {
-      font-family: 'Jost', sans-serif;
-      font-weight: 300;
-      font-size: 1.3rem;
-      letter-spacing: 0.2em;
-      color: var(--subtle);
-    }
-    .lv-solsticio {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.1rem;
-      font-weight: 600;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      background: linear-gradient(135deg, #f5a623, #f26b50);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    /* ─── IDENTIDADE VISUAL ─── */
-    #identidade {
-      flex-direction: column;
-      padding: 8rem 4rem;
-      background: #0a1628;
-    }
-    #identidade .orb-1 { width: 800px; height: 800px; background: radial-gradient(circle, #4a90d9 0%, transparent 70%); top: -200px; left: 50%; transform: translateX(-50%); opacity: 0.2; }
-
-    .project-cards {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2rem;
-      max-width: 1100px;
-      width: 100%;
-      position: relative;
-      z-index: 1;
-    }
-
-    .project-card {
-      border-radius: 4px;
-      overflow: hidden;
-      position: relative;
-      cursor: default;
-    }
-
-    .project-card-inner {
-      position: relative;
-      padding: 3rem;
-      height: 100%;
-      min-height: 380px;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      transition: transform 0.5s;
-    }
-    .project-card:hover .project-card-inner { transform: scale(1.01); }
-
-    .project-bg-brbike {
-      background: linear-gradient(135deg, #0a1a0a 0%, #0d2b15 50%, #0a1a0a 100%);
-      border: 1px solid rgba(76,187,138,0.2);
-    }
-    .project-bg-ehorizon {
-      background: linear-gradient(135deg, #050d2e 0%, #0d1a50 50%, #1a0d40 100%);
-      border: 1px solid rgba(0,200,224,0.2);
-    }
-
-    .project-card-deco {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      pointer-events: none;
-    }
-
-    /* BR Bike deco */
-    .deco-brbike {
-      background:
-        radial-gradient(circle at 70% 30%, rgba(76,187,138,0.25) 0%, transparent 50%),
-        radial-gradient(circle at 30% 70%, rgba(245,166,35,0.2) 0%, transparent 50%);
-    }
-    /* E-Horizon deco */
-    .deco-ehorizon {
-      background:
-        radial-gradient(circle at 70% 30%, rgba(0,200,224,0.3) 0%, transparent 50%),
-        radial-gradient(circle at 30% 60%, rgba(164,116,224,0.3) 0%, transparent 50%);
-    }
-
-    .project-logo-display {
-      font-size: clamp(1.5rem, 3.5vw, 2.5rem);
-      font-weight: 700;
-      margin-bottom: 1rem;
-      letter-spacing: 0.05em;
-    }
-
-    .project-tag {
-      display: inline-block;
-      padding: 0.25rem 0.8rem;
-      border-radius: 100px;
-      font-size: 0.65rem;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      margin-bottom: 1rem;
-    }
-    .tag-green { background: rgba(76,187,138,0.2); color: #4cbb8a; border: 1px solid rgba(76,187,138,0.3); }
-    .tag-blue { background: rgba(0,200,224,0.15); color: #00c8e0; border: 1px solid rgba(0,200,224,0.3); }
-
-    .project-meta { display: flex; flex-direction: column; gap: 0.35rem; }
-    .project-meta-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.8rem;
-      font-weight: 300;
-    }
-    .project-meta-desc {
-      font-size: 0.82rem;
-      color: var(--subtle);
-      font-weight: 200;
-      line-height: 1.7;
-      max-width: 340px;
-    }
-
-    .project-attrs {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-      margin-top: 1rem;
-    }
-    .attr-pill {
-      padding: 0.2rem 0.7rem;
-      border-radius: 100px;
-      font-size: 0.62rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      background: rgba(255,255,255,0.06);
-      color: var(--subtle);
-      border: 1px solid rgba(255,255,255,0.08);
-    }
-
-    /* ─── PROJETO DETALHES PANEL ─── */
-    .project-detail-panel {
-      grid-column: 1 / -1;
-      border-radius: 4px;
-      padding: 3rem;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.06);
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 3rem;
-      align-items: start;
-    }
-
-    .detail-label {
-      font-size: 0.68rem;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-      color: var(--teal);
-      margin-bottom: 0.7rem;
-    }
-    .detail-value {
-      font-size: 0.9rem;
-      font-weight: 200;
-      line-height: 1.8;
-      color: var(--off-white);
-    }
-
-    .palette-dots {
-      display: flex;
-      gap: 0.6rem;
-      align-items: center;
-    }
-    .palette-dot {
-      width: 32px; height: 32px;
-      border-radius: 50%;
-    }
-
-    /* ─── ANIMAÇÕES ─── */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes scrollPulse {
-      0%, 100% { opacity: 0.3; transform: scaleY(1); }
-      50% { opacity: 0.8; transform: scaleY(1.2); }
-    }
-
-    .reveal {
-      opacity: 0;
-      transform: translateY(40px);
-      transition: opacity 0.8s ease, transform 0.8s ease;
-    }
-    .reveal.visible { opacity: 1; transform: translateY(0); }
-
-    /* ─── FOOTER ─── */
-    footer {
-      background: #060e1c;
-      border-top: 1px solid rgba(255,255,255,0.06);
-      padding: 5rem 4rem;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-    footer .orb-1 { width: 500px; height: 300px; background: radial-gradient(circle, #3ecfb2 0%, transparent 70%); top: -100px; left: 50%; transform: translateX(-50%); opacity: 0.15; }
-
-    .footer-name {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(3rem, 8vw, 7rem);
-      font-weight: 300;
-      letter-spacing: -0.02em;
-      color: var(--white);
-      line-height: 1;
-      position: relative;
-      z-index: 1;
-    }
-    .footer-tagline {
-      font-size: 0.75rem;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-      color: var(--subtle);
-      margin-top: 1rem;
-      margin-bottom: 3rem;
-      position: relative;
-      z-index: 1;
-    }
-    .footer-contact {
-      display: flex;
-      gap: 3rem;
-      justify-content: center;
-      position: relative;
-      z-index: 1;
-      flex-wrap: wrap;
-    }
-    .footer-contact-item {
-      display: flex;
-      flex-direction: column;
-      gap: 0.3rem;
-    }
-    .footer-contact-label {
-      font-size: 0.62rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.3);
-    }
-    .footer-contact-value {
-      font-size: 0.88rem;
-      color: var(--teal);
-      text-decoration: none;
-      font-weight: 300;
-    }
-    .footer-contact-value:hover { text-decoration: underline; }
-
-    .footer-bottom {
-      margin-top: 4rem;
-      padding-top: 2rem;
-      border-top: 1px solid rgba(255,255,255,0.04);
-      font-size: 0.65rem;
-      letter-spacing: 0.2em;
-      color: rgba(255,255,255,0.2);
-      position: relative;
-      z-index: 1;
-    }
-
-    /* ─── MOBILE ─── */
-    @media (max-width: 768px) {
-      nav { padding: 1.2rem 1.5rem; }
-      .nav-links { gap: 1.5rem; }
-      .nav-links a { font-size: 0.65rem; }
-      .sobre-grid { grid-template-columns: 1fr; gap: 2.5rem; }
-      .logo-grid { grid-template-columns: 1fr 1fr; }
-      .project-cards { grid-template-columns: 1fr; }
-      .project-detail-panel { grid-template-columns: 1fr; }
-      section { padding-left: 1.5rem; padding-right: 1.5rem; }
-      .footer-contact { gap: 2rem; }
-    }
-
-    /* ─── CURSOR CUSTOM ─── */
-    @media (pointer: fine) {
-      body { cursor: none; }
-      .cursor {
-        width: 10px; height: 10px;
-        background: var(--teal);
-        border-radius: 50%;
-        position: fixed;
-        pointer-events: none;
-        z-index: 99999;
-        transition: transform 0.15s, background 0.3s;
-        mix-blend-mode: screen;
-      }
-      .cursor-ring {
-        width: 36px; height: 36px;
-        border: 1px solid rgba(62,207,178,0.5);
-        border-radius: 50%;
-        position: fixed;
-        pointer-events: none;
-        z-index: 99998;
-        transition: transform 0.35s cubic-bezier(0.23,1,0.32,1);
-      }
-    }
-
-    /* Icons */
-    .icon-spark::before {
-      content: '✦';
-      font-size: 0.9em;
-      color: var(--teal);
-    }
-
-    /* Animated gradient text */
-    .grad-text {
-      background: linear-gradient(90deg, var(--teal), var(--cyan), var(--purple), var(--coral), var(--orange), var(--teal));
-      background-size: 300% 100%;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: gradShift 6s linear infinite;
-    }
-    @keyframes gradShift {
-      0% { background-position: 0% 50%; }
-      100% { background-position: 300% 50%; }
-    }
-
-    /* Star spark */
-    .spark {
-      display: inline-block;
-      width: 14px; height: 14px;
-      background: var(--teal);
-      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-      animation: spinSpark 4s linear infinite;
-    }
-    @keyframes spinSpark {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-
-    /* BR Bike logo display */
-    .lv-brbike-full {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-    }
-    .bike-icon {
-      font-size: 2rem;
-      line-height: 1;
-    }
-    .bike-text {
-      font-family: 'Jost', sans-serif;
-      font-weight: 700;
-      font-size: 1rem;
-      letter-spacing: 0.2em;
-      color: #4cbb8a;
-    }
-
-    /* E-Horizon logo display */
-    .ehorizon-display {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-    }
-    .ehorizon-circle {
-      width: 50px; height: 50px;
-      border: 2px solid rgba(0,200,224,0.7);
-      border-radius: 50%;
-      position: relative;
-      margin-bottom: 4px;
-    }
-    .ehorizon-circle::after {
-      content: '';
-      position: absolute;
-      top: -8px; right: -8px;
-      width: 20px; height: 2px;
-      background: rgba(0,200,224,0.7);
-      transform: rotate(45deg);
-    }
-    .ehorizon-circle::before {
-      content: '';
-      position: absolute;
-      top: -14px; right: -14px;
-      width: 14px; height: 2px;
-      background: rgba(0,200,224,0.5);
-      transform: rotate(45deg);
-    }
-    .ehorizon-text {
-      font-family: 'Jost', sans-serif;
-      font-weight: 600;
-      font-size: 0.9rem;
-      letter-spacing: 0.15em;
-      background: linear-gradient(90deg, #00c8e0, #a474e0);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .ehorizon-studio {
-      font-size: 0.55rem;
-      letter-spacing: 0.4em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.5);
+    @media(max-width:900px){
+      nav{padding:1.2rem 1.5rem;}
+      .nav-links{gap:1rem;}
+      .nav-links a{font-size:.65rem;}
+      .sobre-grid{grid-template-columns:1fr;gap:2.5rem;}
+      .project-categories{grid-template-columns:1fr;}
+      .logo-grid{grid-template-columns:1fr 1fr;}
+      section{padding-left:1.5rem!important;padding-right:1.5rem!important;}
     }
   </style>
 </head>
 <body>
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
 
-  <!-- Custom Cursor -->
-  <div class="cursor" id="cursor"></div>
-  <div class="cursor-ring" id="cursorRing"></div>
+<nav>
+  <a href="#hero" class="nav-logo">Sara <span>Peres</span></a>
+  <ul class="nav-links">
+    <li><a href="#sobre">Sobre</a></li>
+    <li><a href="#projetos">Projetos</a></li>
+    <li><a href="pages/logofólio.html">Logofólio</a></li>
+    <li><a href="pages/identidade-visual.html">Identidade Visual</a></li>
+    <li><a href="pages/social-media.html">Social Media</a></li>
+    <li><a href="#contato">Contato</a></li>
+  </ul>
+</nav>
 
-  <!-- Navigation -->
-  <nav>
-    <a href="#hero" class="nav-logo">Sara <span>Peres</span></a>
-    <ul class="nav-links">
-      <li><a href="#sobre">Sobre</a></li>
-      <li><a href="#logofólio">Logofólio</a></li>
-      <li><a href="#identidade">Identidade Visual</a></li>
-      <li><a href="#contato">Contato</a></li>
-    </ul>
-  </nav>
+<section id="hero">
+  <div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div><div class="orb orb-4"></div>
+  <p class="hero-eyebrow"><span class="spark"></span>&nbsp; Design Gráfico &nbsp;<span class="spark"></span></p>
+  <h1 class="hero-title"><span class="grad-text">PORT</span><br><span>FÓLIO</span></h1>
+  <p class="hero-subtitle">Sara Peres de Souza &nbsp;·&nbsp; Goiânia, GO</p>
+  <a href="#sobre" class="hero-cta">Explorar trabalhos ↓</a>
+  <div class="scroll-hint"><div class="scroll-line"></div>scroll</div>
+</section>
 
-  <!-- ── HERO ── -->
-  <section id="hero">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
-    <div class="orb orb-4"></div>
-
-    <p class="hero-eyebrow"><span class="spark"></span> &nbsp; Design Gráfico &nbsp; <span class="spark"></span></p>
-    <h1 class="hero-title">
-      <span class="grad-text">PORT</span><br>
-      <span style="color:var(--white)">FÓLIO</span>
-    </h1>
-    <p class="hero-subtitle">Sara Peres de Souza &nbsp;·&nbsp; Goiânia, GO</p>
-    <a href="#sobre" class="hero-cta">Explorar trabalhos ↓</a>
-
-    <div class="scroll-hint">
-      <div class="scroll-line"></div>
-      scroll
+<section id="sobre">
+  <div class="orb orb-1"></div><div class="orb orb-2"></div>
+  <div class="sobre-grid reveal">
+    <div class="sobre-img-wrap">
+      <img src="assets/foto/sara.jpeg" alt="Sara Peres de Souza" class="sobre-img"/>
     </div>
-  </section>
-
-  <!-- ── SOBRE MIM ── -->
-  <section id="sobre">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="sobre-grid reveal">
-      <div class="sobre-img-wrap">
-        <div class="sobre-img-placeholder">
-          <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--coral));opacity:0.6;"></div>
-          <p style="font-size:0.72rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--subtle);">Sara Peres</p>
-        </div>
+    <div>
+      <span class="section-label">✦ Sobre mim</span>
+      <h2 class="section-title">Designer <em>criativa</em><br>e apaixonada</h2>
+      <p class="sobre-text">Formada em Design Gráfico pela UNIP Goiânia, atuo como freelancer e possuo experiência no meio corporativo. Minha missão é transformar ideias em identidades visuais marcantes, aliando criatividade à estratégia de comunicação.</p>
+      <p class="sobre-text">Em busca constante de novos desafios, desenvolvo projetos com total criatividade — do conceito à entrega final, cada detalhe é pensado para gerar impacto real.</p>
+      <div class="sobre-info">
+        <span style="color: white;">📍<b>Goiânia, Goiás</b></span>
+        <span>✉️ <a href="mailto:saraperes190@gmail.com" style="color:white;"><b>saraperes190@gmail.com</b></a></span>
+        <span>📱 <a href="https://wa.me/5562995504704" style="color: white;"><b>(62) 99550-4704</b></a></span>
       </div>
-      <div class="sobre-content">
-        <span class="section-label">✦ Sobre mim</span>
-        <h2 class="section-title">Designer <em>criativa</em><br>e apaixonada</h2>
-        <p class="sobre-text">
-          Formada em Design Gráfico pela UNIP Goiânia, atuo como freelancer e acumulo experiência no meio corporativo. Minha missão é transformar ideias em identidades visuais marcantes, aliando criatividade à estratégia de comunicação.
-        </p>
-        <p class="sobre-text">
-          Em busca constante de novos desafios, desenvolvo projetos com total criatividade — do conceito à entrega final, cada detalhe é pensado para gerar impacto real.
-        </p>
-        <div class="sobre-info">
-          <span>📍 Goiânia, Goiás</span>
-          <span>✉️ <a href="mailto:saraperes190@gmail.com">saraperes190@gmail.com</a></span>
-          <span>📱 <a href="tel:+5562995504704">(62) 99550-4704</a></span>
-        </div>
-        <div class="skills-list">
-          <span class="skill-tag">Identidade Visual</span>
-          <span class="skill-tag">Logotipos</span>
-          <span class="skill-tag">Branding</span>
-          <span class="skill-tag">Design Gráfico</span>
-          <span class="skill-tag">Ilustração</span>
-          <span class="skill-tag">Motion</span>
-        </div>
+      <div class="skills-list">
+        <span class="skill-tag">Identidade Visual</span><span class="skill-tag">Logotipos</span>
+        <span class="skill-tag">Branding</span><span class="skill-tag">Social Media</span>
+        <span class="skill-tag">Design Gráfico</span><span class="skill-tag">Freelancer</span>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ── LOGOFÓLIO ── -->
-  <section id="logofólio" style="flex-direction:column;">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-
+<section id="projetos">
+  <div class="orb orb-1"></div><div class="orb orb-2"></div>
+  <div style="max-width:1100px;width:100%;position:relative;z-index:1;">
     <div class="section-header reveal">
-      <span class="section-label">✦ Projetos</span>
-      <h2 class="section-title">Logo<em>fólio</em></h2>
+      <span class="section-label">✦ Portfólio</span>
+      <h2 class="section-title" style="display:block;">Meus <em>Projetos</em></h2>
       <div class="divider-line"></div>
-      <p style="font-size:0.85rem;color:var(--subtle);font-weight:200;margin-top:1.2rem;letter-spacing:0.05em;">
-        Logotipos criados para pessoas, empresas e projetos acadêmicos · 2024–2026
-      </p>
+      <p style="font-size:.85rem;color:var(--subtle);font-weight:200;margin-top:1.2rem;">Explore o trabalho por categoria</p>
     </div>
-
-    <div class="logo-grid reveal">
-
-      <div class="logo-card">
-        <div class="logo-visual">
-          <div class="ehorizon-display">
-            <div class="ehorizon-circle"></div>
-            <div class="ehorizon-text">E—HORIZON</div>
-            <div class="ehorizon-studio">Studio</div>
-          </div>
-        </div>
-        <div class="logo-name">E-Horizon Studio</div>
-        <div class="logo-year">2025</div>
-      </div>
-
-      <div class="logo-card">
-        <div class="logo-visual lv-jefferson">Jefferson Peres</div>
-        <div class="logo-name">Jefferson Peres</div>
-        <div class="logo-year">2024</div>
-      </div>
-
-      <div class="logo-card">
-        <div class="logo-visual">
-          <div class="lv-neetech">neetech</div>
-        </div>
-        <div class="logo-name">Neetech</div>
-        <div class="logo-year">2024</div>
-      </div>
-
-      <div class="logo-card">
-        <div class="logo-visual lv-plume">plume <span style="font-style:italic;font-weight:300;">care</span></div>
-        <div class="logo-name">Plume Care</div>
-        <div class="logo-year">2025</div>
-      </div>
-
-      <div class="logo-card">
-        <div class="logo-visual">
-          <div class="lv-brbike-full">
-            <div class="bike-icon" style="color:#4cbb8a;">⚡🚲</div>
-            <div class="bike-text">BR B⚡KE</div>
-          </div>
-        </div>
-        <div class="logo-name">BR Bike</div>
-        <div class="logo-year">2025</div>
-      </div>
-
-      <div class="logo-card">
-        <div class="logo-visual lv-solsticio">SOLSTÍCIO</div>
-        <div class="logo-name">Solstício</div>
-        <div class="logo-year">2025</div>
-      </div>
-
+    <div class="project-categories">
+      <a href="pages/logofólio.html" class="category-card cat-logos reveal reveal-delay-1">
+        <div class="card-bg"></div>
+        <div class="cat-number">01</div>
+        <span class="cat-icon">✦</span>
+        <div class="cat-title">Logofólio</div>
+        <div class="cat-desc">Logotipos criados para pessoas, empresas e projetos acadêmicos — do conceito ao símbolo.</div>
+        <div class="cat-arrow">Ver projetos <span>→</span></div>
+      </a>
+      <a href="pages/identidade-visual.html" class="category-card cat-identidade reveal reveal-delay-2">
+        <div class="card-bg"></div>
+        <div class="cat-number">02</div>
+        <span class="cat-icon">◈</span>
+        <div class="cat-title">Identidade Visual</div>
+        <div class="cat-desc">Sistemas de marca completos: logo, paleta, tipografia, aplicações e mockups.</div>
+        <div class="cat-arrow">Ver projetos <span>→</span></div>
+      </a>
+      <a href="pages/social-media.html" class="category-card cat-social reveal reveal-delay-3">
+        <div class="card-bg"></div>
+        <div class="cat-number">03</div>
+        <span class="cat-icon">▣</span>
+        <div class="cat-title">Social Media</div>
+        <div class="cat-desc">Posts e conteúdo visual para redes sociais — criativos, estratégicos e orientados a resultado.</div>
+        <div class="cat-arrow">Ver projetos <span>→</span></div>
+      </a>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ── IDENTIDADE VISUAL ── -->
-  <section id="identidade" style="flex-direction:column;">
-    <div class="orb orb-1"></div>
-
+<section id="logofólio">
+  <div class="orb orb-1"></div><div class="orb orb-2"></div>
+  <div style="max-width:1100px;width:100%;position:relative;z-index:1;">
     <div class="section-header reveal">
-      <span class="section-label">✦ Identidade Visual</span>
-      <h2 class="section-title"><em>Identidade</em> Visual</h2>
+      <span class="section-label">✦ Logos</span>
+      <h2 class="section-title" style="display:block;">Logo<em>fólio</em></h2>
       <div class="divider-line"></div>
-      <p style="font-size:0.85rem;color:var(--subtle);font-weight:200;margin-top:1.2rem;">
-        Projetos completos de marca — da concepção ao manual
-      </p>
     </div>
-
-    <div class="project-cards reveal">
-
-      <!-- BR Bike -->
-      <div class="project-card">
-        <div class="project-card-inner project-bg-brbike">
-          <div class="project-card-deco deco-brbike"></div>
-          <div style="position:relative;z-index:1;">
-            <span class="project-tag tag-green">Mobilidade Urbana</span>
-            <div class="project-logo-display" style="color:#4cbb8a;">BR B⚡KE</div>
-            <div class="project-meta">
-              <div class="project-meta-title">BR Bike</div>
-              <div class="project-meta-desc">
-                Identidade visual para marca de bicicletas elétricas. Conceito baseado em velocidade, inovação e energia — com aplicações em cartão de visita, fachada e uniformes.
-              </div>
-            </div>
-            <div class="project-attrs">
-              <span class="attr-pill">Velocidade</span>
-              <span class="attr-pill">Tecnologia</span>
-              <span class="attr-pill">Minimalismo</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- E-Horizon -->
-      <div class="project-card">
-        <div class="project-card-inner project-bg-ehorizon">
-          <div class="project-card-deco deco-ehorizon"></div>
-          <div style="position:relative;z-index:1;">
-            <span class="project-tag tag-blue">Tech / Studio</span>
-            <div class="project-logo-display" style="background:linear-gradient(90deg,#00c8e0,#a474e0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">E—HORIZON</div>
-            <div class="project-meta">
-              <div class="project-meta-title">E-Horizon Studio</div>
-              <div class="project-meta-desc">
-                Identidade para estúdio de inovação tecnológica. Paleta azul-roxo transmite modernidade e ambição. Símbolo circular com traços de velocidade reforça o conceito de horizonte em expansão.
-              </div>
-            </div>
-            <div class="project-attrs">
-              <span class="attr-pill">Inovação</span>
-              <span class="attr-pill">Energia</span>
-              <span class="attr-pill">Presença visual</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Detail panels -->
-      <div class="project-detail-panel">
-        <div>
-          <div class="detail-label">BR Bike — Paleta de cores</div>
-          <div class="palette-dots" style="margin-bottom:1.5rem;">
-            <div class="palette-dot" style="background:#4cbb8a;" title="Verde"></div>
-            <div class="palette-dot" style="background:#f5a623;" title="Amarelo"></div>
-            <div class="palette-dot" style="background:#1a1a1a;" title="Cinza escuro"></div>
-            <div class="palette-dot" style="background:#f5f5f5;border:1px solid rgba(255,255,255,0.1);" title="Branco"></div>
-          </div>
-          <div class="detail-label">Conceito</div>
-          <div class="detail-value">Velocidade e inovação como pilares visuais. A identidade foi construída para ter forte presença no mercado de mobilidade elétrica, sendo versátil o suficiente para aplicações físicas e digitais.</div>
-        </div>
-        <div>
-          <div class="detail-label">E-Horizon — Paleta de cores</div>
-          <div class="palette-dots" style="margin-bottom:1.5rem;">
-            <div class="palette-dot" style="background:#00c8e0;" title="Ciano"></div>
-            <div class="palette-dot" style="background:#a474e0;" title="Roxo"></div>
-            <div class="palette-dot" style="background:#ffffff;border:1px solid rgba(255,255,255,0.1);" title="Branco"></div>
-          </div>
-          <div class="detail-label">Conceito</div>
-          <div class="detail-value">Tecnologia e minimalismo se encontram em uma identidade que comunica ambição sem excesso. O símbolo circular em movimento remete à ideia de horizonte infinito e expansão contínua.</div>
-        </div>
-      </div>
-
+    <div class="logo-grid">
+      <div class="logo-card reveal reveal-delay-1"><img src="assets/logos/e_horizon.png" alt="E-Horizon" class="logo-img"/><div class="logo-name">E-Horizon Studio</div><div class="logo-year">2026</div></div>
+      <div class="logo-card reveal reveal-delay-2"><img src="assets/logos/jefferson.png" alt="Jefferson Peres" class="logo-img"/><div class="logo-name">Jefferson Peres</div><div class="logo-year">2025</div></div>
+      <div class="logo-card reveal reveal-delay-3"><img src="assets/logos/neetech.png" alt="Neetech" class="logo-img"/><div class="logo-name">Neetech</div><div class="logo-year">2026</div></div>
+      <div class="logo-card reveal reveal-delay-1"><img src="assets/logos/plume_care.png" alt="Plume Care" class="logo-img"/><div class="logo-name">Plume Care</div><div class="logo-year">2024</div></div>
+      <div class="logo-card reveal reveal-delay-2"><img src="assets/logos/br_bike.png" alt="BR Bike" class="logo-img"/><div class="logo-name">BR Bike</div><div class="logo-year">2025</div></div>
+      <div class="logo-card reveal reveal-delay-3"><img src="assets/logos/solsticio.png" alt="Solstício" class="logo-img"/><div class="logo-name">Solstício</div><div class="logo-year">2024</div></div>
     </div>
-  </section>
-
-  <!-- ── FOOTER / CONTATO ── -->
-  <footer id="contato">
-    <div class="orb orb-1"></div>
-    <div class="footer-name grad-text">Sara Peres</div>
-    <p class="footer-tagline">Design gráfico júnior &nbsp;·&nbsp; Goiânia, GO &nbsp;·&nbsp; Disponível para novos projetos</p>
-    <div class="footer-contact">
-      <div class="footer-contact-item">
-        <span class="footer-contact-label">E-mail</span>
-        <a href="mailto:saraperes190@gmail.com" class="footer-contact-value">saraperes190@gmail.com</a>
-      </div>
-      <div class="footer-contact-item">
-        <span class="footer-contact-label">Telefone / WhatsApp</span>
-        <a href="https://wa.me/5562995504704" class="footer-contact-value">(62) 99550-4704</a>
-      </div>
-      <div class="footer-contact-item">
-        <span class="footer-contact-label">Localização</span>
-        <span class="footer-contact-value" style="cursor:default;">Goiânia, Goiás — Brasil</span>
-      </div>
+    <div style="text-align:center;margin-top:3rem;">
+      <a href="pages/logofólio.html" style="display:inline-flex;align-items:center;gap:.7rem;padding:.9rem 2.4rem;border:1px solid rgba(255,255,255,.25);border-radius:100px;font-size:.78rem;letter-spacing:.2em;text-transform:uppercase;color:#fff;text-decoration:none;background:rgba(255,255,255,.06);transition:all .3s;" onmouseover="this.style.background='rgba(62,207,178,.2)';this.style.borderColor='#3ecfb2'" onmouseout="this.style.background='rgba(255,255,255,.06)';this.style.borderColor='rgba(255,255,255,.25)'">Ver todos os logos →</a>
     </div>
-    <div class="footer-bottom">
-      © 2025 Sara Peres de Souza &nbsp;·&nbsp; Todos os direitos reservados
-    </div>
-  </footer>
+  </div>
+</section>
 
-  <script>
-    // ─── Cursor ───
-    const cursor = document.getElementById('cursor');
-    const ring = document.getElementById('cursorRing');
-    if (cursor && ring && window.matchMedia('(pointer: fine)').matches) {
-      let mx = 0, my = 0, rx = 0, ry = 0;
-      window.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
-      (function loop() {
-        rx += (mx - rx) * 0.12;
-        ry += (my - ry) * 0.12;
-        cursor.style.left = mx - 5 + 'px';
-        cursor.style.top = my - 5 + 'px';
-        ring.style.left = rx - 18 + 'px';
-        ring.style.top = ry - 18 + 'px';
-        requestAnimationFrame(loop);
-      })();
-    }
+<footer id="contato">
+  <div class="orb orb-1"></div>
+  <div class="footer-name grad-text">Sara Peres</div>
+  <p class="footer-tagline">Design gráfico júnior &nbsp;·&nbsp; Goiânia, GO &nbsp;·&nbsp; Disponível para novos projetos</p>
+  <div class="footer-contact">
+    <div class="footer-contact-item"><span class="footer-contact-label">E-mail</span><a href="mailto:saraperes190@gmail.com" class="footer-contact-value">saraperes190@gmail.com</a></div>
+    <div class="footer-contact-item"><span class="footer-contact-label">WhatsApp</span><a href="https://wa.me/5562995504704" class="footer-contact-value">(62) 99550-4704</a></div>
+    <div class="footer-contact-item"><span class="footer-contact-label">Localização</span><span class="footer-contact-value" style="cursor:default;">Goiânia, Goiás — Brasil</span></div>
+  </div>
+  <div class="footer-bottom">© 2025 Sara Peres de Souza &nbsp;·&nbsp; Todos os direitos reservados</div>
+</footer>
 
-    // ─── Scroll reveal ───
-    const revealEls = document.querySelectorAll('.reveal');
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
-    }, { threshold: 0.12 });
-    revealEls.forEach(el => io.observe(el));
-
-    // ─── Active nav highlight ───
-    const sections = document.querySelectorAll('section, footer');
-    const navLinks = document.querySelectorAll('.nav-links a');
-    const sectionObserver = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          navLinks.forEach(a => {
-            a.style.color = a.getAttribute('href') === '#' + e.target.id ? 'var(--white)' : '';
-          });
-        }
-      });
-    }, { threshold: 0.4 });
-    sections.forEach(s => sectionObserver.observe(s));
-  </script>
+<script>
+  const cur=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
+  if(cur&&ring&&window.matchMedia('(pointer:fine)').matches){
+    let mx=0,my=0,rx=0,ry=0;
+    window.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+    (function loop(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;
+      cur.style.left=mx-5+'px';cur.style.top=my-5+'px';
+      ring.style.left=rx-18+'px';ring.style.top=ry-18+'px';
+      requestAnimationFrame(loop);})();
+  }
+  const io=new IntersectionObserver(e=>e.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target);}}),{threshold:.1});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
 </body>
 </html>

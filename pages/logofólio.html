@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Logofólio — Sara Peres</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../assets/shared.css"/>
+  <style>
+    /* ── GRID ── */
+    .logo-project-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.8rem;
+    }
+
+    /* ── CARD: uniform dark bg, same size ── */
+    .logo-project-card {
+      position: relative;
+      border-radius: 6px;
+      overflow: hidden;
+      background: #0d1829;           /* uniform dark background for all cards */
+      border: 1px solid rgba(255,255,255,0.08);
+      cursor: pointer;
+      transition: all 0.45s cubic-bezier(0.23,1,0.32,1);
+      display: flex;
+      flex-direction: column;
+    }
+    .logo-project-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(62,207,178,0.35);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.55);
+    }
+
+    /* ── IMAGE AREA: fixed height, logo centered ── */
+    .logo-card-img-area {
+      position: relative;
+      height: 220px;                  /* standardized height */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2.5rem;
+      overflow: hidden;
+      background: #0d1829;
+    }
+
+    /* Subtle gradient glow unique per card */
+    .logo-card-img-area::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+    .logo-project-card:hover .logo-card-img-area::before { opacity: 1; }
+
+    .glow-teal .logo-card-img-area::before    { background: radial-gradient(circle at 50% 50%, rgba(62,207,178,0.12), transparent 70%); }
+    .glow-blue .logo-card-img-area::before    { background: radial-gradient(circle at 50% 50%, rgba(61,0,239,0.15), transparent 70%); }
+    .glow-coral .logo-card-img-area::before   { background: radial-gradient(circle at 50% 50%, rgba(242,107,80,0.12), transparent 70%); }
+    .glow-orange .logo-card-img-area::before  { background: radial-gradient(circle at 50% 50%, rgba(245,166,35,0.14), transparent 70%); }
+    .glow-cyan .logo-card-img-area::before    { background: radial-gradient(circle at 50% 50%, rgba(0,200,224,0.14), transparent 70%); }
+    .glow-amber .logo-card-img-area::before   { background: radial-gradient(circle at 50% 50%, rgba(200,80,20,0.15), transparent 70%); }
+
+    .logo-card-img-area img {
+      max-width: 80%;
+      max-height: 130px;
+      object-fit: contain;
+      position: relative;
+      z-index: 1;
+      transition: transform 0.5s cubic-bezier(0.23,1,0.32,1);
+      filter: drop-shadow(0 4px 20px rgba(0,0,0,0.4));
+    }
+    .logo-project-card:hover .logo-card-img-area img { transform: scale(1.1); }
+
+    /* ── HOVER OVERLAY: full blur so text is 100% readable ── */
+    .logo-card-overlay {
+      position: absolute;
+      inset: 0;
+      /* solid dark + strong blur = text always readable */
+      background: rgba(8,16,34,0.93);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.8rem;
+      gap: 0.8rem;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      text-align: center;
+      z-index: 10;
+    }
+    .logo-project-card:hover .logo-card-overlay { opacity: 1; }
+
+    .overlay-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem;
+      font-weight: 400;
+      color: #fff;
+      line-height: 1.2;
+    }
+    .overlay-tag {
+      font-size: 0.62rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--teal);
+    }
+    .overlay-desc {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.72);
+      font-weight: 200;
+      line-height: 1.7;
+    }
+    .overlay-colors {
+      display: flex;
+      gap: 0.6rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 0.3rem;
+    }
+    .overlay-swatch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+
+    .overlay-hex {
+      font-size: 0.55rem;
+      font-family: monospace;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 0.05em;
+    }
+    .overlay-year {
+      font-size: 0.62rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-top: 0.3rem;
+    }
+
+    /* ── CARD FOOTER (always visible) ── */
+    .logo-card-info {
+      padding: 1.2rem 1.6rem 1.5rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    .logo-card-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem;
+      font-weight: 300;
+      color: #fff;
+    }
+    .logo-card-cat {
+      font-size: 0.63rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--teal);
+    }
+
+    @media (max-width:900px){ .logo-project-grid{grid-template-columns:1fr 1fr;} }
+    @media (max-width:580px){ .logo-project-grid{grid-template-columns:1fr;} }
+  </style>
+</head>
+<body>
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<nav>
+  <a href="../index.html" class="nav-logo">Sara <span>Peres</span></a>
+  <ul class="nav-links">
+    <li><a href="../index.html#sobre">Sobre</a></li>
+    <li><a href="../index.html#projetos">Projetos</a></li>
+    <li><a href="logofólio.html" class="active">Logofólio</a></li>
+    <li><a href="identidade-visual.html">Identidade Visual</a></li>
+    <li><a href="social-media.html">Social Media</a></li>
+    <li><a href="../index.html#contato">Contato</a></li>
+  </ul>
+</nav>
+
+<div class="page-header">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <p class="page-breadcrumb"><a href="../index.html">Home</a> &nbsp;/&nbsp; Logofólio</p>
+  <h1 class="page-title">Logo<em>fólio</em></h1>
+  <p class="page-subtitle">Logotipos criados para pessoas, empresas e projetos acadêmicos · 2024–2026<br>Passe o mouse sobre cada logo para ver o conceito e cores.</p>
+</div>
+
+<div class="page-content">
+  <div class="logo-project-grid">
+
+    <!-- E-Horizon -->
+    <div class="logo-project-card glow-blue reveal">
+      <div class="logo-card-img-area">
+        <img src="../assets/logos/e_horizon.png" alt="E-Horizon"/>
+        <div class="logo-card-overlay">
+          <div class="overlay-title">E-Horizon Studio</div>
+          <div class="overlay-desc">O símbolo do horizonte de eventos — o ponto de não retorno de um buraco negro. Círculo em colapso com linhas de aceleração transmitem inovação e ambição no universo digital.</div>
+          <div class="overlay-colors">
+          </div>
+        </div>
+      </div>
+      <div class="logo-card-info">
+        <div class="logo-card-name">E-Horizon Studio</div>
+        <div class="logo-card-cat">Gaming · Tech · Studio</div>
+      </div>
+    </div>
+
+    <!-- Jefferson Peres -->
+    <div class="logo-project-card glow-coral reveal reveal-d1">
+      <div class="logo-card-img-area">
+        <img src="../assets/logos/jefferson.png" alt="Jefferson Peres"/>
+        <div class="logo-card-overlay">
+          <div class="overlay-title">Jefferson Peres</div>
+          <div class="overlay-desc">Marca pessoal com script cursivo elegante sobreposto à tipografia display. A combinação transmite força e sofisticação para presença digital profissional.</div>
+          <div class="overlay-colors">
+          </div>
+        </div>
+      </div>
+      <div class="logo-card-info">
+        <div class="logo-card-name">Jefferson Peres</div>
+        <div class="logo-card-cat">Marca Pessoal</div>
+      </div>
+    </div>
+
+    <!-- Neetech -->
+    <div class="logo-project-card glow-cyan reveal reveal-d2">
+      <div class="logo-card-img-area">
+        <img src="../assets/logos/neetech.png" alt="Neetech"/>
+        <div class="logo-card-overlay">
+          <div class="overlay-title">Neetech</div>
+          <div class="overlay-desc">Logo para empresa de tecnologia e suporte técnico domiciliar. Minimalismo e clareza comunicam confiabilidade, modernidade e acessibilidade ao cliente.</div>
+          <div class="overlay-colors">
+          </div>
+        </div>
+      </div>
+      <div class="logo-card-info">
+        <div class="logo-card-name">Neetech</div>
+        <div class="logo-card-cat">Tecnologia · Suporte Técnico</div>
+      </div>
+    </div>
+
+    <!-- Plume Care -->
+    <div class="logo-project-card glow-teal reveal">
+      <div class="logo-card-img-area">
+        <img src="../assets/logos/plume_care.png" alt="Plume Care"/>
+        <div class="logo-card-overlay">
+          <div class="overlay-title">Plume Care</div>
+          <div class="overlay-desc">A pena como símbolo central evoca leveza, delicadeza e cuidado. Tipografia refinada em duas escalas reforça a dualidade entre suavidade e profissionalismo.</div>
+          <div class="overlay-colors">
+          </div>
+        </div>
+      </div>
+      <div class="logo-card-info">
+        <div class="logo-card-name">Plume Care</div>
+        <div class="logo-card-cat">Cuidados com a pele · Skin care</div>
+      </div>
+    </div>
+
+    <!-- BR Bike -->
+    <div class="logo-project-card glow-orange reveal reveal-d1">
+      <div class="logo-card-img-area">
+        <img src="../assets/logos/br_bike.png" alt="BR Bike"/>
+        <div class="logo-card-overlay">
+          <div class="overlay-title">BR Bike</div>
+          <div class="overlay-desc">O raio elétrico integrado ao símbolo da bicicleta comunica energia, velocidade e mobilidade sustentável.</div>
+          <div class="overlay-colors">
+          </div>
+        </div>
+      </div>
+      <div class="logo-card-info">
+        <div class="logo-card-name">BR Bike</div>
+        <div class="logo-card-cat">Mobilidade Elétrica · Sustentabilidade</div>
+      </div>
+    </div>
+
+    <!-- Solstício -->
+    <div class="logo-project-card glow-amber reveal reveal-d2">
+      <div class="logo-card-img-area">
+        <img src="../assets/logos/solsticio.png" alt="Solstício"/>
+        <div class="logo-card-overlay">
+          <div class="overlay-title">Solstício</div>
+          <div class="overlay-desc">O leque de raios solares em semicírculo representa abundância, calor e expansão. Símbolo geométrico forte com leitura imediata do conceito de solstício — ponto de máxima luz.</div>
+          <div class="overlay-colors">
+          </div>
+        </div>
+      </div>
+      <div class="logo-card-info">
+        <div class="logo-card-name">Solstício</div>
+        <div class="logo-card-cat">energia solar · sustentabilidade</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <div class="orb-f"></div>
+  <div class="footer-inner">
+    <div class="footer-name grad-text">Sara Peres</div>
+    <p class="footer-tagline">Design Gráfico Júnior · Goiânia, GO</p>
+    <div class="footer-contact">
+      <div><span class="fc-label">E-mail</span><a href="mailto:saraperes190@gmail.com" class="fc-val">saraperes190@gmail.com</a></div>
+      <div><span class="fc-label">WhatsApp</span><a href="https://wa.me/5562995504704" class="fc-val">(62) 99550-4704</a></div>
+    </div>
+    <div class="footer-bottom">© 2025 Sara Peres de Souza · Todos os direitos reservados</div>
+  </div>
+</footer>
+
+<script>
+  const cur=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
+  if(cur&&ring&&window.matchMedia('(pointer:fine)').matches){
+    let mx=0,my=0,rx=0,ry=0;
+    window.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+    (function loop(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;
+      cur.style.left=mx-5+'px';cur.style.top=my-5+'px';
+      ring.style.left=rx-18+'px';ring.style.top=ry-18+'px';
+      requestAnimationFrame(loop);})();
+  }
+  const io=new IntersectionObserver(e=>e.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target);}}),{threshold:.1});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
